@@ -7,15 +7,20 @@
     <title>Pokemon</title>
     <!-- Link Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+   <!--link custom css-->
+    <link rel="stylesheet" href="style.css">
 
+    <!-- bootstraps nav component, light colour scheme, background light-->
     <nav class="navbar navbar-light bg-light">
+        <!--container fluid to fill screen-->
         <div class="container-fluid">
+            <!-- logo picture top left -->
             <a class="navbar-brand" href="#">
                 <img src="images/back.jpg" alt="" width="20" height="30" class="d-inline-block align-text-top">
                 Tradecard
             </a>
-
-            <ul class="nav-bar-nav"></ul>
+            <!--MR margain right-->
+            <ul class="nav-bar-nav mr-auto"></ul>
             <li class="nav-item">
                 <a class="nav-link" href="#">Home</a>
             </li>
@@ -28,31 +33,36 @@
 
 
         </div>
+    </nav>
 
 </head>
 
 <body>
-    <div class="jumbotron jumbotron-fluid">
-        <!-- Jumbotron class from bootstrap, fluid to occupy entire horizontal space of parent-->
-        <div class="container">
-
-            <h1 class="display-4">Welcome to Tradecard!</h1>
-
-
-            <p class="lead">The best place for storing and viewing card collections</p>
-
-
-            <p class="lead"> <!--Button setup / non functional atm-->
-                <a class="btn btn-primary btn-lg" href="#" role="button">Sign up</a>
-            </p>
-
+    <!--margain 5 for top and bottom-->
+    <div class="container my-5">
+        <!--body teriary for bootstrap colour theme, padding 5, rounded corners moderate-->
+        <div class="p-5 align-items-center text-center bg-body-tertiary rounded-3">
             <a href="images/pikachu.png">
                 <img src="images/pikachu.png" alt="Pikachu" width="200">
             </a>
-
+            <h1 class="text-body-emphasis">Welcome to Tradecard</h1>
+            <!--column 8 / 12 in grid sys, margains auto, font size 5, text colour muted-->
+            <p class="col-lg-8 mx-auto fs-5 text-muted">
+                The best place for storing and viewing card collections
+            </p>
+            <!--flex container keeping inline, 2 gap, margain bottom-->
+            <div class="d-inline-flex gap-2 mb-5">
+                <!--button aligned centre, flex container,  primary colour, large, 4padding-->
+                <button class="d-inline-flex align-items-center btn btn-primary btn-lg px-4 rounded-pill" type="button">
+                    Sign up
+                </button>
+                <!--button 2nd color, large, 4 pixels, rounded pill shape-->
+                <button class="btn btn-outline-secondary btn-lg px-4 rounded-pill" type="button">
+                    Log in
+                </button>
+            </div>
         </div>
     </div>
-
 
     <!-- Link Bootstrap JavaScript -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
