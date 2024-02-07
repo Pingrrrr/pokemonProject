@@ -1,6 +1,14 @@
-.nav-item {
+/* get rid of bullet points on the navbar*/
+.nav-item { 
     list-style: none;
-
+    
 }
+#jumbotron {
+background-color: #fff;
+}
+
+
+
+
 
 

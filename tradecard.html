@@ -7,9 +7,14 @@
     <title>Pokemon</title>
     <!-- Link Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-   <!--link custom css-->
+    <!--link custom css-->
     <link rel="stylesheet" href="style.css">
 
+
+
+</head>
+
+<body>
     <!-- bootstraps nav component, light colour scheme, background light-->
     <nav class="navbar navbar-light bg-light">
         <!--container fluid to fill screen-->
@@ -34,14 +39,10 @@
 
         </div>
     </nav>
-
-</head>
-
-<body>
     <!--margain 5 for top and bottom-->
-    <div class="container my-5">
+    <div id="jumbotron" class="container-fluid my-5">
         <!--body teriary for bootstrap colour theme, padding 5, rounded corners moderate-->
-        <div class="p-5 align-items-center text-center bg-body-tertiary rounded-3">
+        <div class="p-5 align-items-center text-center rounded-3">
             <a href="images/pikachu.png">
                 <img src="images/pikachu.png" alt="Pikachu" width="200">
             </a>
@@ -64,6 +65,31 @@
         </div>
     </div>
 
+    <div id="gallery" class="container-fluid">
+        <h1 class="text-center my-4 font-weight-bold"> <em>
+            Gotta collect them all!</em></h1>
+        <div class="row">
+            <!-- 33% width for each column on large devices and above -->
+            <div class="col-lg-4">
+                <div class="gallery-item">
+                    <img src="images/buba.png" class="img-fluid" alt="test">
+                </div>
+            </div>
+            <!--sets the width of the column to be 4 columns wide on large-sized devices-->
+            <div class="col-lg-4">
+                <div class="gallery-item">
+                    <img src="images/buba.png" class="img-fluid" alt="test">
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="gallery-item">
+                    <img src="images/buba.png" class="img-fluid" alt="test">
+                </div>
+            </div>
+            <!-- Add more columns as needed -->
+        </div>
+    </div>
+    
     <!-- Link Bootstrap JavaScript -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 </body>
