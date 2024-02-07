@@ -1,13 +1,26 @@
 /* get rid of bullet points on the navbar*/
 .nav-item { 
     list-style: none;
-    
+
+}
+
+.custom-navbar .navbar-brand,
+.custom-navbar .nav-link {
+    color: #ffe734 ; /* Text color of the navbar items */
 }
 #jumbotron {
 background-color: #fff;
 }
 
-/*#banner {
+.custom-navbar {
+    background-color: #f20b0b; 
+}
+
+.row {
+margin: 6px;
+}
+
+/*#banner { 
     background-image: url('images/banner.png');
     background-size: cover;
     background-position: center;

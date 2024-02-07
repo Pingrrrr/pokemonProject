@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>logInPage</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/sign-in/">
+</head>
+
+<body>
+
+
+
+    <!-- Email Input Section -->
+    <!--bootstrap element to add spacing between cols and align the text within the row-->
+    <div class="row g-3 align-items-center">
+        <div class="col-auto">
+            <!--auto adjust content within col-->
+            <label for="inputEmail" class="col-form-label">Email</label>
+        </div>
+        <div class="col-auto">
+            <input type="email" id="inputEmail" class="form-control" aria-describedby="emailHelpInline"
+                placeholder="Enter your email">
+            <!--placeholder within the form-->
+        </div>
+        <div class="col-auto">
+            <span id="emailHelpInline" class="form-text">
+
+            </span>
+        </div>
+    </div>
+
+    <!-- Password Input Section -->
+    <div class="row g-3 align-items-center">
+        <div class="col-auto">
+            <label for="inputPassword6" class="col-form-label">Password</label>
+        </div>
+        <div class="col-auto">
+            <!--characters entered by the user will be obscured
+
+            bootstrap styling for forms-->
+            <input type="password" id="inputPassword6" 
+            class="form-control" aria-describedby="passwordHelpInline"
+                placeholder="Enter your password">
+        </div>
+        <div class="col-auto">
+            <span id="passwordHelpInline" class="form-text">
+                <em> <small> Must be 8-20 characters long. </em></small>
+            </span>
+        </div>
+    </div>
+
+</body>
+
+</html>
