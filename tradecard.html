@@ -7,6 +7,7 @@
     <title>Pokemon</title>
     <!-- Link Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!--< based footer off this css styling link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/footers/">-->
     <!--link custom css-->
     <link rel="stylesheet" href="style.css">
 
@@ -52,13 +53,14 @@
             <!--flex container keeping inline, 2 gap, margain bottom-->
             <div class="d-inline-flex gap-2 mb-5">
                 <!--button aligned centre, flex container,  primary colour, large, 4padding-->
-                <button class="d-inline-flex align-items-center btn btn-primary btn-lg px-4 rounded-pill" type="button">
+                <a href="signup.html" class="btn-primary btn-outline-white btn-lg px-4 rounded-pill" role="button">
                     Sign up
-                </button>
+                </a>
                 <!--button 2nd color, large, 4 pixels, rounded pill shape-->
-                <button class="btn btn-outline-secondary btn-lg px-4 rounded-pill" type="button">
+                <a href="login.html" class="btn btn-outline-secondary btn-lg px-4 rounded-pill" role="button">
                     Log in
-                </button>
+                </a>
+                
             </div>
         </div>
     </div>
@@ -146,8 +148,23 @@
         <!-- Add more columns as needed -->
     </div>
 
-
-
+    <!-- boostrap classes; footer is flex container, wrap on many lines if needed, even space on flex items, align items in centre margain 4 and padding 3-->
+    <div class="container">
+        <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+          <div class="col-md-4 d-flex align-items-center">
+            <!--<img src="images/back.jpg" alt="" width="20" height="30" class="d-inline-block align-text-top">-->
+            <span class="mb-3 mb-md-0 text-body-secondary">&copy; 2023 Tradecard, Inc</span>
+            <!--bottom margain 3, no margain bottom for med + screen-->
+          </div>
+      <!--removes default listing, nav component, bootstrap styling-->
+          <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
+            <!--css marg space between images-->
+            <li class="ms-3"><a class="text-body-secondary" href="#"><img src="images/reddit.png" class="bi" width="24" height="24"></img></a></li>
+            <li class="ms-3"><a class="text-body-secondary" href="#"><img src="images/twitter-icon.webp" class="bi" width="24" height="24"></img></a></li>
+            <li class="ms-3"><a class="text-body-secondary" href="#"><img src="images/discord.png" class="bi" width="24" height="24"></img></a></li>
+          </ul>
+        </footer>
+      </div>
 
     <div id="banner" class="container-fluid">
 

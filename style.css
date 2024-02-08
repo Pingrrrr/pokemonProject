@@ -20,6 +20,10 @@ background-color: #fff;
 margin: 6px;
 }
 
+.ms-3 {
+    margin-left: 0.3rem; /* Adjust as needed */
+}
+
 /*#banner { 
     background-image: url('images/banner.png');
     background-size: cover;
