@@ -24,6 +24,17 @@ margin: 6px;
     margin-left: 0.3rem; /* Adjust as needed */
 }
 
+.col-md-3 {
+    box-sizing: content-box;
+
+}
+
+.containerSign {
+    max-width: 400px;
+    margin: 100px auto;
+}
+
+
 /*#banner { 
     background-image: url('images/banner.png');
     background-size: cover;
