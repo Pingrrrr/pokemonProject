@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cards</title>
+  </head>
+  <body>
+    <header>
+      <h1><%= card.name %></h1>
+    </header>
+
+        <div>
+          <a href="/card?id=<%= card.card_id %>">
+          <div>
+           <%= card.name %>
+          </div>
+          </a>
+        </div>
+        <div class="col-lg-2">
+          <div class="gallery-item">
+              <img src="<%= card.image_url %>/high.webp"  class="img-fluid" alt="pokemon should be here">
+          </div>
+      </div>
+    
+ </body>
+</html>
+

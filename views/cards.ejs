@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cards</title>
+  </head>
+  <body>
+    <header>
+      <h1>Cards</h1>
+    </header>
+     <% dataset.forEach( (card) => { %>
+        <div>
+          <a href="/card?id=<%= card.card_id %>">
+          <div>
+           <%= card.name %>
+          </div>
+          </a>
+        </div>
+     <% }); %>
+ </body>
+</html>
+

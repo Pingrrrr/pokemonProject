@@ -74,13 +74,19 @@
 
     <div class="row mb-4"> <!--marg bottom under imgs-->
 
-        <div class="col-lg-2">
-            <div class="gallery-item">
-                <img src="images/placeholder.jpg" class="img-fluid" alt="test">
-            </div>
-        </div>
+
         <!--sets the width of the column to be 2 columns wide on large-sized devices-->
-        <div class="col-lg-2">
+        <% dataset.forEach((card) => { %>
+            <div class="col-lg-2">
+                <a href="/card?id=<%= card.card_id %>">
+                    <div class="gallery-item">
+                        <img src="<%= card.image_url %>/low.webp" class="img-fluid" alt="test">
+                    </div>
+                </a>
+            </div>
+        <% }); %>
+
+      <!--  <div class="col-lg-2">
             <div class="gallery-item">
                 <img src="images/placeholder.jpg" class="img-fluid" alt="test">
             </div>
@@ -106,45 +112,16 @@
                 <img src="images/placeholder.jpg" class="img-fluid" alt="test">
             </div>
         </div>
-
+    -->
         <!-- Add more columns as needed -->
     </div>
 
     <div class="row mb-4"> <!--marg bottom under imgs-->
 
-        <div class="col-lg-2">
-            <div class="gallery-item">
-                <img src="images/placeholder.jpg" class="img-fluid" alt="test">
-            </div>
-        </div>
+ 
+
+
         <!--sets the width of the column to be 2 columns wide on large-sized devices-->
-        <div class="col-lg-2">
-            <div class="gallery-item">
-                <img src="images/placeholder.jpg" class="img-fluid" alt="test">
-            </div>
-        </div>
-        <div class="col-lg-2">
-            <div class="gallery-item">
-                <img src="images/placeholder.jpg" class="img-fluid" alt="test">
-            </div>
-        </div>
-        <div class="col-lg-2">
-            <div class="gallery-item">
-                <img src="images/placeholder.jpg" class="img-fluid" alt="test">
-            </div>
-        </div>
-
-        <div class="col-lg-2">
-            <div class="gallery-item">
-                <img src="images/placeholder.jpg" class="img-fluid" alt="test">
-            </div>
-        </div>
-        <div class="col-lg-2">
-            <div class="gallery-item">
-                <img src="images/placeholder.jpg" class="img-fluid" alt="test">
-            </div>
-        </div>
-
         <!-- Add more columns as needed -->
     </div>
 
