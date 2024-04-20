@@ -16,28 +16,7 @@
 </head>
 
 <body>
-    <!-- bootstraps nav component, light colour scheme, background light-->
-    <nav class="navbar custom-navbar">
-        <!--container fluid to fill screen-->
-        <div class="container-fluid">
-            <!-- logo picture top left -->
-            <a class="navbar-brand" href="#">
-                <img src="images/back.jpg" alt="" width="20" height="30" class="d-inline-block align-text-top">
-                Tradecard
-            </a>
-            <!--MR margain right-->
-            <ul class="nav-bar-nav mr-auto"></ul>
-            <li class="nav-item">
-                <a class="nav-link" href="#">Home</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">Sets</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">Community</a>
-            </li>
-        </div>
-    </nav>
+    <%- include ('partials/header') %>
     <!--margain 5 for top and bottom-->
     <div id="jumbotron" class="container-fluid my-5">
         <!--body teriary for bootstrap colour theme, padding 5, rounded corners moderate-->

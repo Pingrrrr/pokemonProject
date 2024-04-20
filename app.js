@@ -13,31 +13,24 @@ const db = mysql.createConnection({
     port: '3306'          // MAMP  port might be '8889'
 });
 
-
 db.connect((err)=> {
     if(err) throw err;
     console.log('database connected successfully');
 });
 
-
-
-let read = "SELECT * FROM card";
-db.query(read,(err, result)=>{
-    if(err) throw err;
-    console.table(result);
-});
-
-
-
 app.use(express.static('static'));
 app.set("view engine", "ejs");
 
-app.get("/", function (req, res) {
-    res.send("<h2>My Express Web App </h2>")
+app.get("/", function (req, res){
+    const readcard = `SELECT * FROM card LIMIT 6`;
+    db.query(readcard, (err, dataset)=>{
+        res.render("tradecard", {dataset});
+    })
+    
 });
 
-app.get("/home", function (req, res) {
-    res.sendFile(path.join(__dirname, '/static', 'tradecard.html'))
+app.get('/login', (req, res) => {
+    res.render("login");
 });
 
 app.get("/cards", function (req, res) {
@@ -60,13 +53,7 @@ app.get('/card', (req, res) => {
   })
  });
 
-app.get("/landing", function (req, res){
-    const readcard = `SELECT * FROM card LIMIT 6`;
-    db.query(readcard, (err, dataset)=>{
-        res.render("tradecard", {dataset});
-    })
-    
-});
+
 
 app.get('*', (req, res) => {
     res.send("404! Whoops, I cannot find that!");
