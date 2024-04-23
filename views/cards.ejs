@@ -11,17 +11,23 @@
     <%- include ('partials/header') %>
     
     <header>
-      <h1>Cards</h1>
+      
     </header>
-     <% dataset.forEach( (card) => { %>
-        <div>
-          <a href="/card?id=<%= card.card_id %>">
-          <div>
-           <%= card.name %>
+    <div class="row mb-4"> <!--marg bottom under imgs-->
+
+
+      <!--sets the width of the column to be 2 columns wide on large-sized devices-->
+      <% dataset.forEach((card) => { %>
+          <div class="col-lg-2">
+              <a href="/card?id=<%= card.card_id %>">
+                  <div class="gallery-item">
+                      <img src="<%= card.image_url %>/low.webp" class="img-fluid mb-4" alt="<%= card.name %>">
+                  </div>
+              </a>
           </div>
-          </a>
-        </div>
-     <% }); %>
+      <% }); %>
+  </div>
+
  </body>
 </html>
 

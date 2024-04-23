@@ -9,21 +9,37 @@
   <body>
     <%- include ('partials/header') %>
     <header>
-      <h1><%= card.name %></h1>
+     
     </header>
 
         <div>
-          <a href="/card?id=<%= card.card_id %>">
+          
           <div>
            <%= card.name %>
           </div>
+
+          <div>
+            
+          
           </a>
         </div>
         <div class="col-lg-2">
           <div class="gallery-item">
-              <img src="<%= card.image_url %>/high.webp"  class="img-fluid" alt="pokemon should be here">
+              <img src="<%= card.image_url %>/high.webp"  class="img-fluid" alt="<%= card.name %>">
           </div>
+          
       </div>
+      <% card.attacks.forEach((attack) => { %>
+        <div>
+         <h3> <%= attack.name %> </h3>
+         <p> <%= attack.description %> </p>
+          
+        </div>
+    <% }); %>
+      <div>
+
+      </div>
+      
     
  </body>
 </html>
