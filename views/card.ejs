@@ -1,46 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>cards</title>
-  </head>
-  <body>
-    <%- include ('partials/header') %>
-    <header>
-     
-    </header>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>cards</title>
 
-        <div>
-          
-          <div>
-           <%= card.name %>
-          </div>
+  <style>
+    .gallery-item-wrapper {
+      display: flex;
+      align-items: center;
+    }
+    .image-wrapper {
+      flex: 0 0 auto; 
+    }
 
-          <div>
-            
-          
-          </a>
-        </div>
-        <div class="col-lg-2">
-          <div class="gallery-item">
-              <img src="<%= card.image_url %>/high.webp"  class="img-fluid" alt="<%= card.name %>">
-          </div>
-          
-      </div>
+    .name-description {
+      flex: 1;
+    }
+
+    .image-wrapper img {
+      width: 100%; 
+      height: auto; 
+    }
+  </style>
+</head>
+<body>
+  <%- include ('partials/header') %>
+  <header>
+  </header>
+
+  <div class="gallery-item-wrapper">
+    <div class="image-wrapper">
+      <img src="<%= card.image_url %>/high.webp" class="img-fluid" alt="<%= card.name %>">
+    </div>
+    <div class="name-description">
+      <h3><i><%= card.name %></i></h3>
+      <h4>General information</h4>
+      <p>HP: <%= card.hp %></p>
+      <p>Pokedex ID: <%= card.pokedex_id %></p>
+      <p>Stage: <%= card.stage %></p>
+      <p>Set: <%= card.set_id %></p>
+      <p>Rarity: <%= card.rarity %></p>
+      <p>Illustrator: <%= card.illustrator %></p>
+      <p>Evolved from: <%= card.evolved_from%></p>
+      <h3>Types</h3>
+      <% card.types.forEach((type) => { %>
+        <h5><i><%= type.name %></i></h5>
+      <% }); %>
+
+      <h3><i>Attacks</i></h3>
       <% card.attacks.forEach((attack) => { %>
-        <div>
-         <h3> <%= attack.name %> </h3>
-         <p> <%= attack.description %> </p>
-          
-        </div>
-    <% }); %>
-      <div>
+        <h5><i><%= attack.name %></i></h5>
+        <p><%= attack.description %></p>
+      <% }); %>
 
-      </div>
+      <h3><i>Abilities</i></h3>
+      <% card.abilities.forEach((ability) => { %>
+        <h5><i><%= ability.name %></i></h4>
+        <p><%= ability.description %></p>
+      <% }); %>
+      <h3><i>Resistances</i></h3>
+      <% card.resistances.forEach((resistance) => { %>
+        <h5><i><%= resistance.name %></i></h4>
+        <p><%= resistance.severity %></p>
+      <% }); %>
+      <h3><i>Weaknesses</i></h3>
+      <% card.weaknesses.forEach((weakness) => { %>
+        <h5><i><%= weakness.name %></i></h4>
+        <p><%= weakness.severity %></p>
+      <% }); %>
+
+
+
       
-    
- </body>
+    </div>
+  </div>
+  
+</body>
 </html>
-
