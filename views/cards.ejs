@@ -13,11 +13,30 @@
     <header>
       
     </header>
+
+    <form class="form-inline" action="/cards" method="GET">
+      <label class="my-1 mr-2" for="typeFilter">Type</label>
+      <select class="custom-select my-1 mr-sm-2" id="typeFilter" name="type_f">
+        <option disabled="" readonly="" selected>Type</option>
+        <% types.forEach((type_v) => { %>
+          <option><%= type_v.name %></option>
+        <% }); %>
+      </select>
+
+      <label class="my-1 mr-2" for="stageFilter">Stage</label>
+      <select class="custom-select my-1 mr-sm-2" id="stageFilter" name="stage_f">
+        <option disabled="" readonly="" selected>Stage</option>
+        <% stages.forEach((stage) => { %>
+          <option><%= stage.stage %></option>
+        <% }); %>
+      </select>
+    
+      <button type="submit" class="btn btn-primary my-1">Submit</button>
+    </form>
+
     <div class="row mb-4"> <!--marg bottom under imgs-->
-
-
       <!--sets the width of the column to be 2 columns wide on large-sized devices-->
-      <% dataset.forEach((card) => { %>
+      <% cards.forEach((card) => { %>
           <div class="col-lg-2">
               <a href="/card?id=<%= card.card_id %>">
                   <div class="gallery-item">

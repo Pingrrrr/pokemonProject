@@ -1,8 +1,20 @@
 const express = require("express");
+//const cookieParser = require('cookie-parser');
+//const sessions = require('express-session');
 
 var app = express();
 const path = require('path');
 const PORT = 3000;
+
+const halfDay = 1000 * 60 * 60 * 12;
+
+/*app.use(sessions({
+    secret: "thisisVERYsecretVERYshush2",
+    saveUninitialized: true,
+    cookie: { maxAge: halfDay },
+    resave: false 
+}));*/
+
 
 const mysql = require('mysql2');
 const db = mysql.createConnection({
@@ -19,6 +31,7 @@ db.connect((err) => {
 });
 
 app.use(express.static('static'));
+//app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
 app.get("/", function (req, res) {
@@ -37,11 +50,30 @@ app.get('/signup', (req, res) => {
     res.render("signup");
 });
 
-app.get("/cards", function (req, res) {
-    let cardsQuery = `SELECT *  FROM card`;
+app.get("/cards", async (req, res) => {
+    let typeSQL = await db.promise().query(`SELECT * FROM type`);
+    let types = typeSQL[0];
+
+    let stageSQL = await db.promise().query(`SELECT DISTINCT stage FROM card WHERE stage<>''`);
+    let stages = stageSQL[0];
+    console.log(stages);
+
+    const type_f = req.query.type_f;
+    const type_f_sql = ` INNER JOIN card_type ON card.card_id=card_type.card_id INNER JOIN type ON card_type.type_id=type.type_id WHERE type.name = '${type_f}'`;
+
+    const stage_f = req.query.stage_f;
+    const stage_f_sql = `  WHERE card.stage = '${stage_f}'`;
+
+
+    let cardsQuery = `SELECT card.*  FROM card`;
+    if(type_f!=null && type_f!='None'){
+        cardsQuery += type_f_sql;
+    }
+
+    
     db.query(cardsQuery, (err, dataset) => {
         if (err) throw err;
-        res.render('cards', { dataset });
+        res.render('cards', { cards: dataset, types: types, stages: stages, type_f:type_f });
     })
 });
 
