@@ -6,6 +6,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>cards</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!--< based footer off this css styling link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/footers/">-->
+    <!--link custom css-->
+    <script language="javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
   </head>
   <body>
     <%- include ('partials/header') %>
@@ -13,21 +18,51 @@
     <header>
       
     </header>
-
+    <!-- dynamically set selected: https://stackoverflow.com/questions/65674796/how-do-i-update-which-option-is-selected-based-on-ejs-->
     <form class="form-inline" action="/cards" method="GET">
-      <label class="my-1 mr-2" for="typeFilter">Type</label>
-      <select class="custom-select my-1 mr-sm-2" id="typeFilter" name="type_f">
+
+      
+      <select class="custom-select my-1 mr-sm-2" id="typeFilter" name="type">
         <option disabled="" readonly="" selected>Type</option>
-        <% types.forEach((type_v) => { %>
-          <option><%= type_v.name %></option>
+        <% types.forEach((type) => { %>
+          <option <%= [].concat(lastQuery.type).includes(type.name) ? 'selected' :'' %>> <%= type.name %></option>
         <% }); %>
       </select>
 
-      <label class="my-1 mr-2" for="stageFilter">Stage</label>
-      <select class="custom-select my-1 mr-sm-2" id="stageFilter" name="stage_f">
+      <select class="custom-select my-1 mr-sm-2" id="stageFilter" name="stage">
         <option disabled="" readonly="" selected>Stage</option>
         <% stages.forEach((stage) => { %>
           <option><%= stage.stage %></option>
+        <% }); %>
+
+      </select>
+
+      <select class="custom-select my-1 mr-sm-2" id="rarityFilter" name="rarity">
+        <option disabled="" readonly="" selected>Rarity</option>
+        <% rarities.forEach((rarity) => { %>
+          <option><%= rarity.rarity %></option>
+        <% }); %>
+      </select>
+
+      <select class="custom-select my-1 mr-sm-2" id="categoryFilter" name="category">
+        <option disabled="" readonly="" selected>Category</option>
+        <% categories.forEach((category) => { %>
+          <option><%= category.category %></option>
+        <% }); %>
+      </select>
+
+
+      <select class="custom-select my-1 mr-sm-2" id="weaknessFilter" name="weakness">
+        <option disabled="" readonly="" selected>Weakness</option>
+        <% types.forEach((weakness) => { %>
+          <option><%= weakness.name %></option>
+        <% }); %>
+      </select>
+
+      <select class="custom-select my-1 mr-sm-2" id="resistanceFilter" name="resistance">
+        <option disabled="" readonly="" selected>Resistance</option>
+        <% types.forEach((resistance) => { %>
+          <option><%= resistance.name %></option>
         <% }); %>
       </select>
     

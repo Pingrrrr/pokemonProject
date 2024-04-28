@@ -32,8 +32,8 @@ typeMap.set('Water', 11);
 
 
 
-let set = "base1";
-let setID = 1;
+let set = "base3";
+let setID = 3;
 let setUrlBase = "https://api.tcgdex.net/v2/en/sets/";
 let cardUrlBase = "https://api.tcgdex.net/v2/en/cards/";
 

@@ -46,34 +46,87 @@ app.get('/login', (req, res) => {
     res.render("login");
 });
 
+
 app.get('/signup', (req, res) => {
     res.render("signup");
 });
 
 app.get("/cards", async (req, res) => {
+    let lastQuery = req.query;
     let typeSQL = await db.promise().query(`SELECT * FROM type`);
     let types = typeSQL[0];
 
     let stageSQL = await db.promise().query(`SELECT DISTINCT stage FROM card WHERE stage<>''`);
     let stages = stageSQL[0];
-    console.log(stages);
 
-    const type_f = req.query.type_f;
-    const type_f_sql = ` INNER JOIN card_type ON card.card_id=card_type.card_id INNER JOIN type ON card_type.type_id=type.type_id WHERE type.name = '${type_f}'`;
+    let raritySQL = await db.promise().query(`SELECT DISTINCT rarity FROM card WHERE rarity<>''`);
+    let rarities = raritySQL[0];
 
-    const stage_f = req.query.stage_f;
-    const stage_f_sql = `  WHERE card.stage = '${stage_f}'`;
+    let categorySQL = await db.promise().query(`SELECT DISTINCT category FROM card WHERE category<>''`);
+    let categories = categorySQL[0];
 
+    let cardsQuery = `SELECT card.*  FROM card `;
+    let joins = [];
+    let wheres = [];
 
-    let cardsQuery = `SELECT card.*  FROM card`;
-    if(type_f!=null && type_f!='None'){
-        cardsQuery += type_f_sql;
+    const type = req.query.type;
+    const type_join = `INNER JOIN card_type ON card.card_id=card_type.card_id INNER JOIN type ON card_type.type_id=type.type_id`;
+    const type_where = `type.name IN ('${[].concat(type).join(`','`)}')`;
+
+    const stage = req.query.stage;
+    const stage_where = `card.stage IN ('${[].concat(stage).join(`','`)}')`;
+
+    const rarity = req.query.rarity;
+    const rarity_where = `card.rarity IN ('${[].concat(rarity).join(`','`)}')`;
+
+    const category = req.query.category;
+    const category_where = `card.category IN ('${[].concat(category).join(`','`)}')`;
+
+    const weakness = req.query.weakness;
+    const weakness_join = `INNER JOIN weakness ON card.card_id=weakness.card_id`;
+    const weakness_where = `weakness.type_id IN (SELECT type.type_id FROM type WHERE name IN ('${[].concat(weakness).join(`','`)}'))`;
+
+    const resistance = req.query.resistance;
+    const resistance_join = `INNER JOIN resistance ON card.card_id=resistance.card_id`;
+    const resistance_where = `resistance.type_id IN (SELECT type.type_id FROM type WHERE name IN ('${[].concat(resistance).join(`','`)}'))`;
+
+    if(type!=null && type!='None'){
+        joins.push(type_join);
+        wheres.push(type_where);        
     }
 
+    if(stage!=null){
+        wheres.push(stage_where);
+    }
+
+    if(rarity!=null){
+        wheres.push(rarity_where);
+    }
+
+    if(category!=null){
+        wheres.push(category_where);
+    }
+
+    if(weakness!=null){
+        joins.push(weakness_join);
+        wheres.push(weakness_where);
+    }
+
+    if(resistance!=null){
+        joins.push(resistance_join);
+        wheres.push(resistance_where);
+    }
+
+    cardsQuery += joins.join(' ');
+    if(wheres.length>0){
+        cardsQuery+=" WHERE "+wheres.join(' AND ');
+    }
+    console.log(cardsQuery);
+    console.log(lastQuery.type);
     
     db.query(cardsQuery, (err, dataset) => {
         if (err) throw err;
-        res.render('cards', { cards: dataset, types: types, stages: stages, type_f:type_f });
+        res.render('cards', { cards: dataset, types: types, stages: stages, rarities:rarities, categories:categories, lastQuery:lastQuery });
     })
 });
 
