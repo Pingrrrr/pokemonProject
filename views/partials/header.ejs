@@ -7,7 +7,6 @@
     <!--link custom css-->
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
     <nav class="navbar custom-navbar">
         <!--container fluid to fill the screen-->
@@ -17,6 +16,12 @@
                 <img src="images/back.jpg" alt="" width="20" height="30" class="d-inline-block align-text-top">
                 Tradecard
             </a>
+            <!--warning YELLOW, success GREEN-->
+            <!-- https://getbootstrap.com/docs/4.0/components/navbar/-->
+            <form class="form-inline my-2 my-lg-0">
+                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-warning my-2 my-sm-0" type="submit">Search</button>
+            </form>
             <!--MR margain right-->
             <ul class="nav-bar-nav mr-auto"></ul>
             <li class="nav-item">
@@ -28,12 +33,6 @@
             <li class="nav-item">
                 <a class="nav-link" href="/community">Community</a>
             </li>
-            <!--warning YELLOW, success GREEN-->
-            <!-- https://getbootstrap.com/docs/4.0/components/navbar/-->
-            <form class="form-inline my-2 my-lg-0">
-                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-warning my-2 my-sm-0" type="submit">Search</button>
-            </form>
         </div>
 
     </nav>

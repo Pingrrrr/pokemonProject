@@ -14,19 +14,19 @@
 
 <body>
 
-
     <div class="container">
+        <strong><%= errMsg %></strong>
         <!-- Login Form -->
-        <form> <!--Start of login form-->
+        <form action="/login" method="POST"> <!--Start of login form-->
             <!--The for attribute in the this tag is a link. It tells the label which input element it's associated with. -->
             <div class="form-group row">
-                <label for="inputEmail" class="col-md-3 col-form-label">Email</label>
-                <input type="email" id="inputEmail" class="form-control" aria-describedby="emailHelpInline"
-                    placeholder="Enter your email">
+                <label for="username" class="col-md-3 col-form-label">Username</label>
+                <input name="username" type="text" id="username" class="form-control" aria-describedby="emailHelpInline"
+                    placeholder="Enter your username">
             </div>
             <div class="form-group row">
                 <label for="inputPassword" class="col-md-3 col-form-label">Password</label>
-                <input type="password" id="inputPassword" class="form-control" aria-describedby="passwordHelpInline"
+                <input name="password" type="password" id="inputPassword" class="form-control" aria-describedby="passwordHelpInline"
                     placeholder="Enter your password">
             </div>
             <!-- Sign-in Button -->

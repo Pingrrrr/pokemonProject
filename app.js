@@ -1,19 +1,25 @@
 const express = require("express");
-//const cookieParser = require('cookie-parser');
-//const sessions = require('express-session');
+const bodyParser = require('body-parser')
+const cookieParser = require('cookie-parser');
+const sessions = require('express-session');
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
+
 
 var app = express();
 const path = require('path');
 const PORT = 3000;
 
+const jsonParser = bodyParser.json();
+const urlencodedParser = bodyParser.urlencoded({ extended: true })
 const halfDay = 1000 * 60 * 60 * 12;
 
-/*app.use(sessions({
+app.use(sessions({
     secret: "thisisVERYsecretVERYshush2",
     saveUninitialized: true,
     cookie: { maxAge: halfDay },
     resave: false 
-}));*/
+}));
 
 
 const mysql = require('mysql2');
@@ -31,10 +37,15 @@ db.connect((err) => {
 });
 
 app.use(express.static('static'));
-//app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
+
 app.get("/", function (req, res) {
+    const sessionobj = req.session;
+    if(sessionobj.authen){
+        res.redirect('/dashboard');
+    }
     const readcard = `SELECT * FROM card LIMIT 12`;
     db.query(readcard, (err, dataset) => {
         res.render("tradecard", { dataset });
@@ -43,12 +54,81 @@ app.get("/", function (req, res) {
 });
 
 app.get('/login', (req, res) => {
-    res.render("login");
+    res.render("login", {errMsg: ""});
+});
+
+app.post('/login', urlencodedParser, async (req, res) => {
+    console.log(req.body);
+    const username = req.body.username;
+    const password = req.body.password;
+    let sess_obj = req.session;
+    
+    const checkuser = `SELECT * FROM user WHERE user_name = "${username}" `;
+
+    db.query(checkuser, async (err, rows) => {
+        if(err) throw err;
+        const numRows = rows.length;
+        if(numRows > 0){
+            //check the password
+            const comparison = await bcrypt.compare(password, rows[0].user_password);
+            if(comparison){
+                sess_obj.authen = rows[0].user_id;
+                sess_obj.username = username;
+                res.redirect('/dashboard');
+            }else{
+                let errMsg = 'Incorrect username or password';
+                res.render("login", {errMsg:errMsg});
+            }
+
+            
+        }else{
+            let errMsg = 'Incorrect username or password';
+            res.render("login", {errMsg:errMsg});
+        }
+    });
+});
+
+app.get('/logout', (req, res) => {
+    req.session.destroy();
+    res.redirect('/');
+});
+
+app.get('/dashboard',(req, res)=>{
+    console.log("get dashboard");
+    const sessionobj = req.session;
+    if(sessionobj.authen){
+        res.render("dashboard", {session: req.session});
+    }else{
+        res.send("403: access denied");
+    } 
 });
 
 
 app.get('/signup', (req, res) => {
     res.render("signup");
+});
+
+//https://kennethscoggins.medium.com/how-to-use-mysql-password-encryption-with-nodejs-express-and-bcrypt-ad9ede661109
+app.post('/signup', urlencodedParser ,async (req, res) => {
+    console.log("posted signup");
+    const username = req.body.username;
+    const password = req.body.password;    
+    const encryptedPassword = await bcrypt.hash(password, saltRounds);
+
+    let insertUserSQL = `INSERT into user (user_name, user_password) VALUES (?,?)`;
+    let insertResult = await db.promise().query(insertUserSQL, [username,encryptedPassword]);
+    let uid = insertResult[0].insertId;
+    if(uid){
+        req.session.uid = uid;
+        req.session.authen = uid;
+        req.session.username = username;
+    
+        res.redirect('/dashboard');
+    }else{
+        let errMsg = "Something went wrong..."
+        res.render("signup", {errMsg: errMsg});
+    }
+
 });
 
 app.get("/cards", async (req, res) => {
