@@ -45,11 +45,14 @@ app.get("/", function (req, res) {
     const sessionobj = req.session;
     if(sessionobj.authen){
         res.redirect('/dashboard');
+    }else{
+        const readcard = `SELECT * FROM card LIMIT 12`;
+        db.query(readcard, (err, dataset) => {
+            res.render("tradecard", { dataset });
+        })
+
     }
-    const readcard = `SELECT * FROM card LIMIT 12`;
-    db.query(readcard, (err, dataset) => {
-        res.render("tradecard", { dataset });
-    })
+
 
 });
 
@@ -96,8 +99,29 @@ app.get('/logout', (req, res) => {
 app.get('/dashboard',(req, res)=>{
     console.log("get dashboard");
     const sessionobj = req.session;
+    
     if(sessionobj.authen){
-        res.render("dashboard", {session: req.session});
+        const collectionsSQL = `SELECT * FROM collection WHERE user_id =${sessionobj.authen}`;
+        db.query(collectionsSQL,(err, dataset) => {
+            res.render("dashboard", {collections: dataset, session: req.session});
+        });
+        
+    }else{
+        res.send("403: access denied");
+    } 
+});
+
+app.post('/dashboard', urlencodedParser, (req, res)=>{
+    const sessionobj = req.session;
+    const collection = req.body.collection;
+    let insertSQLcollection = `INSERT into collection (user_id, collection_name, is_wishlist) VALUES (?,?,?)`;
+
+    if(sessionobj.authen){
+        db.query ( insertSQLcollection, [sessionobj.authen,collection,false], (err, dataset) => {
+            if (err) throw err;
+           // res.render("dashboard", {session: req.session });
+            res.redirect('/dashboard');
+        });
     }else{
         res.send("403: access denied");
     } 
@@ -122,6 +146,20 @@ app.post('/signup', urlencodedParser ,async (req, res) => {
         req.session.uid = uid;
         req.session.authen = uid;
         req.session.username = username;
+
+        //todo: make this into a function
+        let insertSQLcollection = `INSERT into collection (user_id, collection_name, is_wishlist) VALUES (?,?,?)`;
+        if(uid){
+            db.query ( insertSQLcollection, [uid,username+"'s Collection",false], (err, dataset) => {
+                if (err) throw err;
+                db.query ( insertSQLcollection, [uid,username+"'s Wishlist",true], (err, dataset) => {
+                    if (err) throw err;
+                    
+                });
+
+            });
+        }
+
     
         res.redirect('/dashboard');
     }else{
@@ -132,6 +170,7 @@ app.post('/signup', urlencodedParser ,async (req, res) => {
 });
 
 app.get("/cards", async (req, res) => {
+    const sess_obj = req.session;
     let lastQuery = req.query;
     let typeSQL = await db.promise().query(`SELECT * FROM type`);
     let types = typeSQL[0];
@@ -145,9 +184,31 @@ app.get("/cards", async (req, res) => {
     let categorySQL = await db.promise().query(`SELECT DISTINCT category FROM card WHERE category<>''`);
     let categories = categorySQL[0];
 
+    let collections=[];
+
+    if(sess_obj.authen){
+        let collectionsSQL = await db.promise().query(`SELECT * FROM collection WHERE user_id = ${sess_obj.authen}`);
+        collections = collectionsSQL[0];
+    }
+
     let cardsQuery = `SELECT card.*  FROM card `;
     let joins = [];
     let wheres = [];
+    let orderby = ``;
+
+    const sorts = new Map();
+    sorts.set('pokedex', '-card.pokedex_id DESC'); //sort nulls last: https://stackoverflow.com/a/8174026
+    sorts.set('nameasc', 'card.name ASC');
+    sorts.set('namedesc', 'card.name DESC');
+
+    const sortby = req.query.sortby;
+    const sortby_orderby=` ORDER BY ${sorts.get(sortby)}`;
+
+    const name = req.query.name;
+    const name_where = `LOWER(card.name) LIKE "%${name}%"`;
+
+    const collection = req.query.collection;
+    const collection_where = `card.card_id IN (SELECT card_collection.card_id FROM card_collection WHERE card_collection.collection_id IN ('${[].concat(collection).join(`','`)}'))`;
 
     const type = req.query.type;
     const type_join = `INNER JOIN card_type ON card.card_id=card_type.card_id INNER JOIN type ON card_type.type_id=type.type_id`;
@@ -170,6 +231,14 @@ app.get("/cards", async (req, res) => {
     const resistance_join = `INNER JOIN resistance ON card.card_id=resistance.card_id`;
     const resistance_where = `resistance.type_id IN (SELECT type.type_id FROM type WHERE name IN ('${[].concat(resistance).join(`','`)}'))`;
 
+    if(sortby!=null ){
+        orderby=sortby_orderby;
+    }
+
+    if(name!=null && name!=''){
+        wheres.push(name_where);
+    }
+
     if(type!=null && type!='None'){
         joins.push(type_join);
         wheres.push(type_where);        
@@ -187,6 +256,10 @@ app.get("/cards", async (req, res) => {
         wheres.push(category_where);
     }
 
+    if(collection!=null){
+        wheres.push(collection_where);
+    }
+
     if(weakness!=null){
         joins.push(weakness_join);
         wheres.push(weakness_where);
@@ -201,12 +274,14 @@ app.get("/cards", async (req, res) => {
     if(wheres.length>0){
         cardsQuery+=" WHERE "+wheres.join(' AND ');
     }
+    cardsQuery+=orderby;
     console.log(cardsQuery);
     console.log(lastQuery.type);
     
     db.query(cardsQuery, (err, dataset) => {
         if (err) throw err;
-        res.render('cards', { cards: dataset, types: types, stages: stages, rarities:rarities, categories:categories, lastQuery:lastQuery });
+        console.log(lastQuery);
+        res.render('cards', { cards: dataset, types: types, stages: stages, rarities:rarities, categories:categories, collections:collections, lastQuery:lastQuery, session:sess_obj });
     })
 });
 

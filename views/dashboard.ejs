@@ -14,4 +14,32 @@
 <body>
     <%- include ('partials/header') %>
     <h1>Welcome to your dashboard <%= session.username %></h1>
+    <div>
+        <ul>
+        <% collections.forEach((collection) => { %>
+            <li>
+            <a href="/cards?collection=<%= collection.collection_id %>"><%= collection.collection_name %></a>
+        </li>
+            <% }); %>
+        </ul>
+    </div>
+    <div>
+    <form action="/dashboard" method="POST"> <!--Start of login form-->
+        <!--The for attribute in the this tag is a link. It tells the label which input element it's associated with. -->
+        <div class="form-group row">
+            <label for="collection" class="col-md-3 col-form-label">Collection name</label>
+            <input name="collection" type="text" id="collection" class="form-control"
+                placeholder="Fire pokemon">
+        </div>
+        <!-- Sign-in Button -->
+        <div class="form-group row">
+            <!--takes up space = 3/12 to help positioning and alignment-->
+            <div class="col-md-3"></div>
+            <button type="submit" class="btn btn-primary btn-block mt-3">Make a collection</button>
+            <!--button has the primary Bootstrap button style,-->
+        </div>
+    </form>
+    </div>
+
+    <%- include ('partials/footer') %>
 </body>
