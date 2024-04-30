@@ -18,6 +18,13 @@
     <header>
       
     </header>
+
+  <% if(messages.collectionMessage) { %>
+      <div class="alert alert-success">
+          <%= messages.collectionMessage %>
+      </div>
+      <% } %>
+
     
 
     <!-- dynamically set selected: https://stackoverflow.com/questions/65674796/how-do-i-update-which-option-is-selected-based-on-ejs-->
@@ -133,10 +140,10 @@
     <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
       <% [].concat(collections).forEach((collection) => { %>
       <li>
-        <form action="/cards" method="GET">
+        <form action="/cards" method="POST">
         <input type="hidden" name="card_id" value="<%= card.card_id %>">
         <input type="hidden" name="collection_id" value="<%= collection.collection_id %>">
-        <button class="dropdown-item" type="submit"><%= collection.collection_name %></button>
+        <button class="dropdown-item" type="submit" <%=collection.cards.includes(card.card_id) ? 'disabled' : '' %>><%= collection.collection_name %></button>
       </form>
       </li>
       <% }); %>
@@ -149,6 +156,9 @@
       <% }); %>
   </div>
 
+  
+
+  <%- include ('partials/footer') %>
  </body>
 </html>
 

@@ -1,4 +1,5 @@
 const express = require("express");
+flash = require('express-flash'); //https://www.npmjs.com/package/express-flash & https://stackoverflow.com/a/42341464
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser');
 const sessions = require('express-session');
@@ -36,12 +37,16 @@ db.connect((err) => {
     console.log('database connected successfully');
 });
 
+
 app.use(express.static('static'));
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser('keyboard cat'));
+app.use(flash());
 app.set("view engine", "ejs");
 
 
 app.get("/", function (req, res) {
+    
     const sessionobj = req.session;
     if(sessionobj.authen){
         res.redirect('/dashboard');
@@ -52,6 +57,8 @@ app.get("/", function (req, res) {
         })
 
     }
+
+
 
 
 });
@@ -119,7 +126,6 @@ app.post('/dashboard', urlencodedParser, (req, res)=>{
     if(sessionobj.authen){
         db.query ( insertSQLcollection, [sessionobj.authen,collection,false], (err, dataset) => {
             if (err) throw err;
-           // res.render("dashboard", {session: req.session });
             res.redirect('/dashboard');
         });
     }else{
@@ -169,6 +175,24 @@ app.post('/signup', urlencodedParser ,async (req, res) => {
 
 });
 
+app.post("/cards", (req, res) =>{
+    //cant add cards to collection unless you're logged in
+    const sess_obj = req.session;
+    if(!sess_obj.authen){
+        res.send("Access Denied");
+    }else{
+        const card_id = req.body.card_id;
+        const collection_id = req.body.collection_id;
+        let insertSQLcardcollection = `INSERT into card_collection (collection_id, card_id) VALUES (${collection_id},${card_id})`;
+        console.log(insertSQLcardcollection);
+        db.query(insertSQLcardcollection,(err, dataset)=>{
+            req.flash('collectionMessage', 'Added to Collection!');
+            res.redirect('back');
+        });
+
+    }
+})
+
 app.get("/cards", async (req, res) => {
     const sess_obj = req.session;
     let lastQuery = req.query;
@@ -187,8 +211,22 @@ app.get("/cards", async (req, res) => {
     let collections=[];
 
     if(sess_obj.authen){
-        let collectionsSQL = await db.promise().query(`SELECT * FROM collection WHERE user_id = ${sess_obj.authen}`);
-        collections = collectionsSQL[0];
+        let collectionsSQL = await db.promise().query(`SELECT collection.* FROM collection WHERE collection.user_id = ${sess_obj.authen} ORDER BY collection.collection_id`);
+        console.log(collectionsSQL[0]);
+        collectionsSQL[0].forEach(async (row)=>{
+            console.log(row);
+            row.cards=[];
+            let cardCollectionsSQL = await db.promise().query(`SELECT card_id FROM card_collection WHERE collection_id = ${row.collection_id}`);
+            cardCollectionsSQL[0].forEach((card)=>{
+                row.cards.push(card.card_id);
+            });
+            console.log(row.cards);
+            collections.push(row);
+        });
+
+        //collections = collectionsSQL[0];
+        console.log("collections");
+        console.log(collections);
     }
 
     let cardsQuery = `SELECT card.*  FROM card `;
@@ -283,6 +321,7 @@ app.get("/cards", async (req, res) => {
         console.log(lastQuery);
         res.render('cards', { cards: dataset, types: types, stages: stages, rarities:rarities, categories:categories, collections:collections, lastQuery:lastQuery, session:sess_obj });
     })
+
 });
 
 //ONE CARD

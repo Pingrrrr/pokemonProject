@@ -31,19 +31,45 @@
   </header>
 
   <div class="gallery-item-wrapper">
+    
     <div class="image-wrapper">
+      
       <img src="<%= card.image_url %>/high.webp" class="img-fluid" alt="<%= card.name %>">
+
     </div>
     <div class="name-description">
-      <h3><i><%= card.name %></i></h3>
-      <h4>General information</h4>
-      <p>HP: <%= card.hp %></p>
-      <p>Pokedex ID: <%= card.pokedex_id %></p>
-      <p>Stage: <%= card.stage %></p>
-      <p>Set: <%= card.set_id %></p>
-      <p>Rarity: <%= card.rarity %></p>
-      <p>Illustrator: <%= card.illustrator %></p>
-      <p>Evolved from: <%= card.evolved_from%></p>
+      <!--https://getbootstrap.com/docs/4.2/layout/grid/-->
+      <div class="container">
+        <h3><i><%= card.name %></i></h3>
+        <h4>General information</h4>
+        <div class="row">
+          <div class="col-sm">
+            HP: <%= card.hp %>
+          </div>
+          <div class="col-sm">
+            Pokedex ID: <%= card.pokedex_id %>
+          </div>
+          <div class="col-sm">
+            Stage: <%= card.stage %>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm">
+            Set: <%= card.set_id %>
+          </div>
+          <div class="col-sm">
+            Rarity: <%= card.rarity %>
+          </div>
+          <div class="col-sm">
+            Illustrator: <%= card.illustrator %>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm">
+            Evolved from: <%= card.evolved_from%>
+          </div>
+        </div>
+      </div>
       <h3>Types</h3>
       <% card.types.forEach((type) => { %>
         <h5><i><%= type.name %></i></h5>
@@ -76,6 +102,6 @@
       
     </div>
   </div>
-  
+  <%- include ('partials/footer') %>
 </body>
 </html>
