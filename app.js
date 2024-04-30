@@ -175,18 +175,41 @@ app.post('/signup', urlencodedParser ,async (req, res) => {
 
 });
 
-app.post("/cards", (req, res) =>{
+app.post("/add-card", (req, res) =>{
     //cant add cards to collection unless you're logged in
     const sess_obj = req.session;
     if(!sess_obj.authen){
         res.send("Access Denied");
     }else{
+
+        //todo: cant add cards to someone elses collection
         const card_id = req.body.card_id;
         const collection_id = req.body.collection_id;
         let insertSQLcardcollection = `INSERT into card_collection (collection_id, card_id) VALUES (${collection_id},${card_id})`;
         console.log(insertSQLcardcollection);
         db.query(insertSQLcardcollection,(err, dataset)=>{
             req.flash('collectionMessage', 'Added to Collection!');
+            res.update()
+            res.redirect('back');
+        });
+
+    }
+})
+
+app.post("/remove-card", (req, res) =>{
+    //cant remove cards from collection unless you're logged in
+    const sess_obj = req.session;
+    if(!sess_obj.authen){
+        res.send("Access Denied");
+    }else{
+
+        //todo: cant remove cards from someone elses collection
+        const card_id = req.body.card_id;
+        const collection_id = req.body.collection_id;
+        let deleteSQLcardcollection = `DELETE FROM card_collection WHERE collection_id=${collection_id} AND card_id=${card_id}`;
+        console.log(deleteSQLcardcollection);
+        db.query(deleteSQLcardcollection,(err, dataset)=>{
+            req.flash('collectionMessage', 'Card removed from Collection!');
             res.redirect('back');
         });
 
@@ -229,15 +252,18 @@ app.get("/cards", async (req, res) => {
         console.log(collections);
     }
 
-    let cardsQuery = `SELECT card.*  FROM card `;
+    let cardsQuery = `SELECT card.*  FROM card INNER JOIN \`set\` ON card.set_id=\`set\`.set_id INNER JOIN expansion ON set.expansion_id=expansion.expansion_id`;
     let joins = [];
     let wheres = [];
     let orderby = ``;
+    let limit = 50; //default
 
     const sorts = new Map();
     sorts.set('pokedex', '-card.pokedex_id DESC'); //sort nulls last: https://stackoverflow.com/a/8174026
     sorts.set('nameasc', 'card.name ASC');
     sorts.set('namedesc', 'card.name DESC');
+
+    const limit_results = req.query.limit;
 
     const sortby = req.query.sortby;
     const sortby_orderby=` ORDER BY ${sorts.get(sortby)}`;
@@ -268,6 +294,16 @@ app.get("/cards", async (req, res) => {
     const resistance = req.query.resistance;
     const resistance_join = `INNER JOIN resistance ON card.card_id=resistance.card_id`;
     const resistance_where = `resistance.type_id IN (SELECT type.type_id FROM type WHERE name IN ('${[].concat(resistance).join(`','`)}'))`;
+
+    const set = req.query.set;
+    const set_where = `\`set\`.set_id = ${set}`;
+
+    const expansion = req.query.expansion;
+    const expansion_where = `expansion.expansion_id = ${expansion}`;
+
+    if(limit_results!=null){
+        limit=limit_results;
+    }
 
     if(sortby!=null ){
         orderby=sortby_orderby;
@@ -308,18 +344,36 @@ app.get("/cards", async (req, res) => {
         wheres.push(resistance_where);
     }
 
+    if(set!=null ){
+        wheres.push(set_where);
+    }
+
+    if(expansion!=null ){
+        wheres.push(expansion_where);
+    }
+
     cardsQuery += joins.join(' ');
     if(wheres.length>0){
         cardsQuery+=" WHERE "+wheres.join(' AND ');
     }
     cardsQuery+=orderby;
+    cardsQuery+=" LIMIT "+limit;
     console.log(cardsQuery);
     console.log(lastQuery.type);
     
     db.query(cardsQuery, (err, dataset) => {
         if (err) throw err;
         console.log(lastQuery);
-        res.render('cards', { cards: dataset, types: types, stages: stages, rarities:rarities, categories:categories, collections:collections, lastQuery:lastQuery, session:sess_obj });
+        res.render('cards', 
+            { cards: dataset, 
+                types: types, 
+                stages: stages, 
+                rarities:rarities, 
+                categories:categories, 
+                collections:collections, 
+                collection: collection,
+                lastQuery:lastQuery, 
+                session:sess_obj });
     })
 
 });
@@ -368,6 +422,15 @@ WHERE card.card_id = ${card_id}`;
     console.log(card);
     res.render('card', { card });
 
+});
+
+app.get(`/sets`, (req, res) => {
+    let setSQL = `SELECT * FROM \`set\` `;
+    db.query(setSQL, (err, dataset) => {
+        console.log(dataset);
+        res.render('sets', {sets:dataset})
+    });
+    
 });
 
 app.get('*', (req, res) => {
