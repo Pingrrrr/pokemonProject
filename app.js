@@ -22,6 +22,12 @@ app.use(sessions({
     resave: false 
 }));
 
+//https://stackoverflow.com/a/37184041
+app.use(function(req, res, next) {
+    res.locals.authen = req.session.authen;
+    next();
+  });
+
 
 const mysql = require('mysql2');
 const db = mysql.createConnection({
@@ -424,11 +430,36 @@ WHERE card.card_id = ${card_id}`;
 
 });
 
+app.get(`/community`,  (req, res) => {
+    let communitySQL = `SELECT collection.*, user.user_name FROM collection INNER JOIN user ON user.user_id = collection.user_id LIMIT 5; `;
+    db.query(communitySQL, async (err, dataset) => {
+
+        console.log(dataset);
+        let collections = dataset
+        let cardsList = [];
+        let cardsCollectionSQL = `SELECT * FROM collection LEFT JOIN card_collection ON collection.collection_id=card_collection.collection_id WHERE collection.collection_id = ? LIMIT 5`;
+        await dataset.forEach(async (row)=>{
+            let cards = await db.promise().query(cardsCollectionSQL, [row.collection_id])
+            cardsList = cardsList.concat(cards);
+        });
+        console.log(cardsList);
+        res.render('community', {cards:cardsList, collections:collections})
+    });
+    
+});
+
 app.get(`/sets`, (req, res) => {
-    let setSQL = `SELECT * FROM \`set\` `;
+    let setSQL = `SELECT \`set\`.*, expansion.expansion_id, expansion.name AS 'expansion_name' FROM \`set\` LEFT JOIN expansion ON \`set\`.expansion_id=expansion.expansion_id`;
     db.query(setSQL, (err, dataset) => {
         console.log(dataset);
-        res.render('sets', {sets:dataset})
+        let expansions = new Map();
+        dataset.forEach((row)=>{
+            if(!expansions.has(row.expansion_id)){
+                expansions.set(row.expansion_id, {expansion_name:row.expansion_name, expansion_id:row.expansion_id});
+            }
+        });
+        console.log(expansions);
+        res.render('sets', {sets:dataset, expansions:expansions})
     });
     
 });

@@ -127,9 +127,10 @@
                   <% }); %>
 
                     <% }); %>
-
-                      <div>
-                        <label for="sortby">Sort By: </label>
+                    <div class="form-inline">
+                      <label  class="col-mb3 mx-2" for="sortby">Sort By: </label>
+                      <div class="col-mb3">
+                        
                         <select name="sortby">
                           <option value="pokedex" <%=lastQuery.sortby==='pokedex' ? 'selected' : '' %>>Pokedex Number
                           </option>
@@ -140,8 +141,9 @@
                         </select>
                       </div>
 
-                      <div>
-                        <label for="limit">Show: </label>
+                      <label  class="col-mb3 mx-2" for="limit">Show: </label>
+                      <div class="col-mb3">
+                        
                         <select name="limit">
                           <option value="25" <%=lastQuery.limit==='25' ? 'selected' : '' %>>25 cards
                           </option>
@@ -150,6 +152,7 @@
                           <option value="100" <%=lastQuery.limit==='100' ? 'selected' : '' %>>100 cards
                           </option>
                         </select>
+                      </div>
                       </div>
 
 

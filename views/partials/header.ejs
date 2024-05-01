@@ -37,8 +37,11 @@
             <div class="dropdown">
                 <button class="btn dropdown-toggle nav-link" type="button" data-bs-toggle="dropdown">Account</button>
                 <ul class="dropdown-menu checkbox-menu allow-focus">
+                    <% if(!authen){%>
+                    <li><a class="dropdown-item" href="/login">Log In</a></li>
+                    <% }else{%>
                     <li><a class="dropdown-item" href="/logout">Logout</a></li>
-                    <li><a class="dropdown-item" href="#">Settings</a></li>
+                    <% }%>
                 </ul>
               </div>
         </div>

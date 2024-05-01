@@ -17,26 +17,29 @@
 
 <body>
 
-    <div class="container mt-5">
+    
 
-        <% expansions.forEach((value, key)=> { %>
-        <h3><%= value.expansion_name %></h3>
+    <div class="container mt-5">
+        <h3><i>Check out the community collections!</h3></i>
+        
+        <% collections.forEach((value, key)=> { %>
+            <a href="/cards?collection=<%= value.collection_id %>"><%= value.collection_name + " (" +value.user_name+")" %></a> 
         <div class="row">
-          <% sets.forEach((set) => { %>
-            <%  if(set.expansion_id==value.expansion_id){ %>
+          <% cards.forEach((card) => { %>
+            <%  if(card.collection_id==value.collection_id){ %>
             <div class="col-lg-2 col-md-3 col-sm-4 col-6 text-center mb-4">
-              <a href="/cards?set=<%= set.set_id %>">
+              <a href="/cards?collection=<%= card.collection_id %>">
                 <!--https://getbootstrap.com/docs/4.1/utilities/sizing/-->
                 <!--https://getbootstrap.com/docs/5.3/utilities/object-fit/-->
-                <img src="<%= set.image_url %>.webp" class="img-fluid mb-2" alt="<%= set.name %>" style="width: 100%; height: 100px; Object-fit: contain">
-                <p><%= set.name %></p>
+                <img src="<%= card.image_url %>.webp" class="img-fluid mb-2" alt="<%= card.name %>" style="width: 100%; height: 100px; Object-fit: contain">
+                <p><%= card.name %></p>
               </a>
             </div>
             <% } %>
           <% }); %>
         </div>
         <% }); %>
-        Incubating brand new pokemon eggs! <strong>Check back soon...</strong>
+        
       </div>
 
       
