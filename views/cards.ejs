@@ -153,14 +153,11 @@
                           </option>
                         </select>
                       </div>
+                      <label  class="col-mb3 mx-2" for="limit">Total Results: <%= totalCardCount %> </label>
                       </div>
+                    </form>
 
-
-        </form>
-
-
-
-
+                      
         <div class="row mb-4"> <!--marg bottom under imgs-->
 
 
@@ -224,6 +221,25 @@
             </div>
             <% }); %>
         </div>
+
+
+        <nav class="container-fluid" aria-label="Page navigation example">
+          <ul class="pagination justify-content-center pagination-lg">
+                        
+            <% if(page>0){ %>
+            <li class="page-item"><a class="page-link" href='<%= "/cards-prev?"+origUrl %>'>Previous</a></li>
+            <% } %>
+
+            <% if(((parseInt(page)+1)*limit)<totalCardCount){ %>
+            <li class="page-item"><a class="page-link" href='<%= "/cards-next?"+origUrl %>'>Next</a></li>
+            <% } %>
+          </ul>
+        </nav>
+        
+
+
+
+
 
 
 

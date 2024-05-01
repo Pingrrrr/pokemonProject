@@ -4,6 +4,7 @@ const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser');
 const sessions = require('express-session');
 const bcrypt = require('bcrypt');
+const url = require('url');
 const saltRounds = 10;
 
 
@@ -195,7 +196,7 @@ app.post("/add-card", (req, res) =>{
         console.log(insertSQLcardcollection);
         db.query(insertSQLcardcollection,(err, dataset)=>{
             req.flash('collectionMessage', 'Added to Collection!');
-            res.update()
+         
             res.redirect('back');
         });
 
@@ -258,18 +259,25 @@ app.get("/cards", async (req, res) => {
         console.log(collections);
     }
 
-    let cardsQuery = `SELECT card.*  FROM card INNER JOIN \`set\` ON card.set_id=\`set\`.set_id INNER JOIN expansion ON set.expansion_id=expansion.expansion_id`;
+    let countSelect = `SELECT COUNT(card.card_id)  AS card_count FROM card `;
+    let cardSelect = `SELECT card.*  FROM card `;
+    let cardsQuery = `INNER JOIN \`set\` ON card.set_id=\`set\`.set_id INNER JOIN expansion ON set.expansion_id=expansion.expansion_id `;
     let joins = [];
     let wheres = [];
     let orderby = ``;
-    let limit = 50; //default
+    let limit = 25; //default
+    let page = 0; //default
+
+
 
     const sorts = new Map();
     sorts.set('pokedex', '-card.pokedex_id DESC'); //sort nulls last: https://stackoverflow.com/a/8174026
     sorts.set('nameasc', 'card.name ASC');
     sorts.set('namedesc', 'card.name DESC');
 
+
     const limit_results = req.query.limit;
+    const results_page = req.query.page;
 
     const sortby = req.query.sortby;
     const sortby_orderby=` ORDER BY ${sorts.get(sortby)}`;
@@ -309,6 +317,10 @@ app.get("/cards", async (req, res) => {
 
     if(limit_results!=null){
         limit=limit_results;
+    }
+
+    if(results_page!=null){
+        page=results_page;
     }
 
     if(sortby!=null ){
@@ -362,16 +374,37 @@ app.get("/cards", async (req, res) => {
     if(wheres.length>0){
         cardsQuery+=" WHERE "+wheres.join(' AND ');
     }
+
+    
+    
+
+    countQuery=countSelect+cardsQuery;
+    console.log(countQuery);
+    let queryCount = await db.promise().query(countQuery);
+    queryCount = queryCount[0][0];
+    console.log(queryCount);
+
+    cardsQuery=cardSelect+cardsQuery;
+
+    //order and limit the actual query
     cardsQuery+=orderby;
-    cardsQuery+=" LIMIT "+limit;
+    cardsQuery+=` LIMIT ${limit} OFFSET ${page*limit} `; //https://stackoverflow.com/a/53574331
     console.log(cardsQuery);
     console.log(lastQuery.type);
+    let origUrl = req.originalUrl.split('?')[1] ? req.originalUrl.split('?')[1]:"";
+    console.log("ORIGINAL URL: "+origUrl);
+
     
     db.query(cardsQuery, (err, dataset) => {
         if (err) throw err;
         console.log(lastQuery);
         res.render('cards', 
-            { cards: dataset, 
+            { 
+                origUrl:  origUrl,
+                totalCardCount: queryCount.card_count,
+                limit: limit,
+                page: page,
+                cards: dataset, 
                 types: types, 
                 stages: stages, 
                 rarities:rarities, 
@@ -429,6 +462,26 @@ WHERE card.card_id = ${card_id}`;
     res.render('card', { card });
 
 });
+
+app.get('/cards-next', (req, res)=>{
+    req.query.page = req.query.page==null?1:parseInt(req.query.page)+1;
+    res.redirect(url.format({
+        pathname:"/cards",
+        query:req.query,
+      }));
+
+})
+
+app.get('/cards-prev', (req, res)=>{
+    req.query.page = (req.query.page==null || parseInt(req.query.page)<1)?0:parseInt(req.query.page)-1;
+    res.redirect(url.format({
+        pathname:"/cards",
+        query:req.query,
+      }));
+
+})
+
+
 
 app.get(`/community`,  (req, res) => {
     let communitySQL = `SELECT collection.*, user.user_name FROM collection INNER JOIN user ON user.user_id = collection.user_id LIMIT 5; `;

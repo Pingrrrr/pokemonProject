@@ -18,21 +18,22 @@
 <body>
     <%- include ('partials/header') %>
     <h1>Welcome to your dashboard <%= session.username %></h1>
-    <div>
-        <i><%= session.username %>'s collections!
-        <ul>
-        <% collections.forEach((collection) => { %></i>
-            <li>
-            <a href="/cards?collection=<%= collection.collection_id %>"><%= collection.collection_name %></a>
-        </li>
-            <% }); %>
-        </ul>
-    </div>
+   
     <div>
         <!--https://getbootstrap.com/docs/5.0/layout/columns/-->
         <div class="container mt-5">
             <div class="row justify-content-center">
               <div class="col-md-6">
+                <div>
+                    <i><%= session.username %>'s collections!
+                    <ul>
+                    <% collections.forEach((collection) => { %></i>
+                        <li>
+                        <a href="/cards?collection=<%= collection.collection_id %>"><%= collection.collection_name %></a>
+                    </li>
+                        <% }); %>
+                    </ul>
+                </div>
                 <form action="/dashboard" method="POST"> 
                     <!-- Start of login form -->
                   <div class="form-group">

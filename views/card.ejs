@@ -79,35 +79,71 @@
       </div>
 
 
-
+      <div class="container">
+        <h3>Types</h3>
+        
+        <div class="row">
+          <div class="col-sm">
+            <% card.types.forEach((type) => { %>
+              <h5><i><%= type.name %></i></h5>
+            <% }); %>
+          </div>
+        </div>
+        </div>
       
-      <h3>Types</h3>
-      <% card.types.forEach((type) => { %>
-        <h5><i><%= type.name %></i></h5>
-      <% }); %>
 
-      <h3><i>Attacks</i></h3>
-      <% card.attacks.forEach((attack) => { %>
-        <h5><i><%= attack.name %></i></h5>
-        <p><%= attack.description %></p>
-      <% }); %>
+        <div class="container">
+          <h3>Attacks</h3>
+          
+          <div class="row">
+            <div class="col-sm">
+              <% card.attacks.forEach((attack) => { %>
+                <h5><i><%= attack.name %></i></h5>
+                <p><%= attack.description %></p>
+              <% }); %>
+            </div>
+          </div>
+          </div>
+      
+          <div class="container">
+            <h3>Abilities</h3>
+            
+            <div class="row">
+              <div class="col-sm">
+                <% card.abilities.forEach((ability) => { %>
+                  <h5><i><%= ability.name %></i></h4>
+                  <p><%= ability.description %></p>
+                <% }); %>
+              </div>
+            </div>
+            </div>
+      
 
-      <h3><i>Abilities</i></h3>
-      <% card.abilities.forEach((ability) => { %>
-        <h5><i><%= ability.name %></i></h4>
-        <p><%= ability.description %></p>
-      <% }); %>
-      <h3><i>Resistances</i></h3>
-      <% card.resistances.forEach((resistance) => { %>
-        <h5><i><%= resistance.name %></i></h4>
-        <p><%= resistance.severity %></p>
-      <% }); %>
-      <h3><i>Weaknesses</i></h3>
-      <% card.weaknesses.forEach((weakness) => { %>
-        <h5><i><%= weakness.name %></i></h4>
-        <p><%= weakness.severity %></p>
-      <% }); %>
-
+            <div class="container">
+              <h3>Resistances</h3>
+              
+              <div class="row">
+                <div class="col-sm">
+                  <% card.resistances.forEach((resistance) => { %>
+                    <h5><i><%= resistance.name %></i></h4>
+                    <p><%= resistance.severity %></p>
+                  <% }); %>
+                </div>
+              </div>
+              </div>    
+ 
+              <div class="container">
+                <h3>Weaknesses</h3>
+                
+                <div class="row">
+                  <div class="col-sm">
+                    <% card.weaknesses.forEach((weakness) => { %>
+                      <h5><i><%= weakness.name %></i></h4>
+                      <p><%= weakness.severity %></p>
+                    <% }); %>
+                  </div>
+                </div>
+                </div> 
 
 
       
