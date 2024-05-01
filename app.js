@@ -490,11 +490,15 @@ app.get(`/community`,  (req, res) => {
         console.log(dataset);
         let collections = dataset
         let cardsList = [];
-        let cardsCollectionSQL = `SELECT * FROM collection LEFT JOIN card_collection ON collection.collection_id=card_collection.collection_id WHERE collection.collection_id = ? LIMIT 5`;
-        await dataset.forEach(async (row)=>{
-            let cards = await db.promise().query(cardsCollectionSQL, [row.collection_id])
-            cardsList = cardsList.concat(cards);
-        });
+        let cardsCollectionSQL = `SELECT * FROM card_collection INNER JOIN card ON card_collection.card_id=card.card_id WHERE card_collection.collection_id = ? LIMIT 5; `;
+        for(let i =0; i<dataset.length;i++){
+            let cards = await db.promise().query(cardsCollectionSQL, [dataset[i].collection_id])
+            console.log("CARDS::")
+            console.log(cards[0])
+           cardsList = cardsList.concat(cards[0]);
+        }
+
+        console.log("CARDSLIST");
         console.log(cardsList);
         res.render('community', {cards:cardsList, collections:collections})
     });
