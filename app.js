@@ -58,7 +58,7 @@ app.get("/", function (req, res) {
     if(sessionobj.authen){
         res.redirect('/dashboard');
     }else{
-        const readcard = `SELECT * FROM card LIMIT 12`;
+        const readcard = `SELECT * FROM card ORDER BY RAND() LIMIT 12 `;
         db.query(readcard, (err, dataset) => {
             res.render("tradecard", { dataset });
         })
@@ -484,7 +484,7 @@ app.get('/cards-prev', (req, res)=>{
 
 
 app.get(`/community`,  (req, res) => {
-    let communitySQL = `SELECT collection.*, user.user_name FROM collection INNER JOIN user ON user.user_id = collection.user_id LIMIT 5; `;
+    let communitySQL = `SELECT collection.*, user.user_name FROM collection INNER JOIN user ON user.user_id = collection.user_id ORDER BY RAND() LIMIT 5; `;
     db.query(communitySQL, async (err, dataset) => {
 
         console.log(dataset);
