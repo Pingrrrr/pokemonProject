@@ -1,8 +1,5 @@
 const express = require("express");
 const flash = require('express-flash'); //https://www.npmjs.com/package/express-flash & https://stackoverflow.com/a/42341464
-const bodyParser = require('body-parser')
-const urlencodedParser = bodyParser.urlencoded({ extended: true })
-const cookieParser = require('cookie-parser');
 const sessions = require('express-session');
 const bcrypt = require('bcrypt');
 const url = require('url');
@@ -322,7 +319,7 @@ app.get("/cards", async (req, res) => {
     let wheres = [];
     let values = [];
     let orderby = ``;
-    let limit = 25; //default
+    let limit = 24; //default
     let page = 0; //default
 
 
