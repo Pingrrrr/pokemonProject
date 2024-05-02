@@ -35,6 +35,13 @@
                     </ul>
                 </div>
                 <form action="/dashboard" method="POST"> 
+                    <% if(messages.errMsgs){ %>
+                    <% [].concat(messages.errMsgs).forEach((err)=>{ %>
+                        <div class="alert alert-danger">
+                            <%= err %>
+                        </div>
+                    <% }); %>
+                    <% } %>
                     <!-- Start of login form -->
                   <div class="form-group">
                     <label for="collection">Collection name</label>

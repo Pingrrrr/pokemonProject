@@ -18,7 +18,11 @@
 <body>
 
     <div class="container">
-        <strong><%= errMsg %></strong>
+        <% [].concat(errMsgs).forEach((err)=>{ %>
+            <div class="alert alert-danger">
+                <%= err %>
+            </div>
+        <% }); %>
         <!-- Login Form -->
         <form action="/login" method="POST"> <!--Start of login form-->
             <!--The for attribute in the this tag is a link. It tells the label which input element it's associated with. -->
