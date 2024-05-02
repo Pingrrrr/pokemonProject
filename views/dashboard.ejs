@@ -17,45 +17,46 @@
 </head>
 <body>
     <%- include ('partials/header') %>
-    <h1>Welcome to your dashboard <%= session.username %></h1>
-   
-    <div>
-        <!--https://getbootstrap.com/docs/5.0/layout/columns/-->
-        <div class="container mt-5">
-            <div class="row justify-content-center">
-              <div class="col-md-6">
-                <div>
-                    <i><%= session.username %>'s collections!
-                    <ul>
-                    <% collections.forEach((collection) => { %></i>
-                        <li>
-                        <a href="/cards?collection=<%= collection.collection_id %>"><%= collection.collection_name %></a>
-                    </li>
-                        <% }); %>
-                    </ul>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <h1 class="text-center mb-4">Welcome to your dashboard, <%= session.username %></h1>
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <form action="/dashboard" method="POST"> 
+                            <% if(messages.errMsgs){ %>
+                                <% [].concat(messages.errMsgs).forEach((err)=>{ %>
+                                    <div class="alert alert-danger">
+                                        <%= err %>
+                                    </div>
+                                <% }); %>
+                            <% } %>
+                            <div class="mb-3">
+                                <label for="collection" class="form-label">Collection name</label>
+                                <input name="collection" type="text" id="collection" class="form-control" placeholder="Enter collection name">
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">Create New Collection</button>
+                        </form>
+                    </div>
                 </div>
-                <form action="/dashboard" method="POST"> 
-                    <% if(messages.errMsgs){ %>
-                    <% [].concat(messages.errMsgs).forEach((err)=>{ %>
-                        <div class="alert alert-danger">
-                            <%= err %>
-                        </div>
-                    <% }); %>
-                    <% } %>
-                    <!-- Start of login form -->
-                  <div class="form-group">
-                    <label for="collection">Collection name</label>
-                    <input name="collection" type="text" id="collection" class="form-control" placeholder="Fire pokemon">
-                  </div>
-                  <!-- Sign-in Button -->
-                  <div class="form-group">
-                    <button type="submit" class="btn btn-primary btn-block">Make a new collection</button>
-                  </div>
-                </form>
-              </div>
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <h4 class="card-title"><%= session.username %>'s Collections</h4>
+                        <ul class="list-group">
+                            <% collections.forEach((collection) => { %>
+                                <li class="list-group-item">
+                                    <a href="/cards?collection=<%= collection.collection_id %>"><%= collection.collection_name %></a>
+                                </li>
+                            <% }); %>
+                        </ul>
+                    </div>
+                </div>
+                <div class="text-center mt-4">
+                    <img src="images/banner.png" alt="banner" class="img-fluid" style="max-width: 400px;">
+                </div>
             </div>
-          </div>
-        
-
+        </div>
+    </div>
     <%- include ('partials/footer') %>
 </body>
+

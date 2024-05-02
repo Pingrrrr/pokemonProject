@@ -6,149 +6,93 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
   integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-<!--< based footer off this css styling link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/footers/">-->
-<!--link custom css-->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"
-  integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
-  crossorigin="anonymous"></script>
-  <title>cards</title>
-
-  <style>
-    .gallery-item-wrapper {
-      display: flex;
-      align-items: center;
-    }
-    .image-wrapper {
-      flex: 0 0 auto; 
-    }
-
-    .name-description {
-      flex: 1;
-    }
-
-    .image-wrapper img {
-      width: 100%; 
-      height: auto; 
-    }
-  </style>
-</head>
-<body>
+  <title><%= card.name %></title>
   <%- include ('partials/header') %>
-  <header>
-  </header>
+</head>
 
-  <div class="gallery-item-wrapper">
-    
-    <div class="image-wrapper">
-      
-      <img src="<%= card.image_url %>/high.webp" class="img-fluid" alt="<%= card.name %>">
+<body>
 
-    </div>
-    <div class="name-description">
-      <!--https://getbootstrap.com/docs/4.2/layout/grid/-->
-      <div class="container">
-        <h3><i><%= card.name %></i></h3>
-        <h4>General information</h4>
-        <div class="row">
-          <div class="col-sm">
-            HP: <%= card.hp %>
-          </div>
-          <div class="col-sm">
-            Pokedex ID: <%= card.pokedex_id %>
-          </div>
-          <div class="col-sm">
-            Stage: <%= card.stage %>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-sm">
-            Set: <%= card.set_id %>
-          </div>
-          <div class="col-sm">
-            Rarity: <%= card.rarity %>
-          </div>
-          <div class="col-sm">
-            Illustrator: <%= card.illustrator %>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-sm">
-            Evolved from: <%= card.evolved_from%>
-          </div>
-        </div>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-5">
+        <img src="<%= card.image_url %>/high.webp" class="img-fluid mx-auto d-block" alt="<%= card.name %>">
       </div>
-
-
-      <div class="container">
-        <h3>Types</h3>
-        
-        <div class="row">
-          <div class="col-sm">
-            <% card.types.forEach((type) => { %>
-              <h5><i><%= type.name %></i></h5>
-            <% }); %>
-          </div>
-        </div>
-        </div>
-      
-
-        <div class="container">
-          <h3>Attacks</h3>
-          
+      <div class="col-md-7">
+        <div class="name-description">
+          <h3><i><%= card.name %></i></h3>
+          <h4>General information</h4>
           <div class="row">
-            <div class="col-sm">
-              <% card.attacks.forEach((attack) => { %>
-                <h5><i><%= attack.name %></i></h5>
-                <p><%= attack.description %></p>
+            <div class="col-md-4">
+              HP: <%= card.hp %>
+            </div>
+            <div class="col-md-4">
+              Pokedex ID: <%= card.pokedex_id %>
+            </div>
+            <div class="col-md-4">
+              Stage: <%= card.stage %>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+              Evolved from: <%= card.evolved_from%>
+            </div>
+            <div class="col-md-4">
+              Rarity: <%= card.rarity %>
+            </div>
+            <div class="col-md-4">
+              Set: <%= card.set_id %>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md">
+              Illustrator: <%= card.illustrator %>
+            </div>
+          </div>
+
+          <h3>Types</h3>
+          <% card.types.forEach((type) => { %>
+            <h5><i><%= type.name %></i></h5>
+          <% }); %>
+
+          <h3>Attacks</h3>
+          <% card.attacks.forEach((attack) => { %>
+            <h5><i><%= attack.name %></i></h5>
+            <p><%= attack.description %></p>
+          <% }); %>
+
+          <h3>Abilities</h3>
+          <% card.abilities.forEach((ability) => { %>
+            <h5><i><%= ability.name %></i></h4>
+            <p><%= ability.description %></p>
+          <% }); %>
+
+          <div class="row">
+            <div class="col-md">
+              <h3>Resistances</h3>
+              <% card.resistances.forEach((resistance) => { %>
+                <h5><i><%= resistance.name %></i></h5>
+                <p><%= resistance.severity %></p>
+              <% }); %>
+            </div>
+            <div class="col-md">
+              <h3>Weaknesses</h3>
+              <% card.weaknesses.forEach((weakness) => { %>
+                <h5><i><%= weakness.name %></i></h5>
+                <p><%= weakness.severity %></p>
               <% }); %>
             </div>
           </div>
-          </div>
-      
-          <div class="container">
-            <h3>Abilities</h3>
-            
-            <div class="row">
-              <div class="col-sm">
-                <% card.abilities.forEach((ability) => { %>
-                  <h5><i><%= ability.name %></i></h4>
-                  <p><%= ability.description %></p>
-                <% }); %>
-              </div>
-            </div>
-            </div>
-      
 
-            <div class="container">
-              <h3>Resistances</h3>
-              
-              <div class="row">
-                <div class="col-sm">
-                  <% card.resistances.forEach((resistance) => { %>
-                    <h5><i><%= resistance.name %></i></h4>
-                    <p><%= resistance.severity %></p>
-                  <% }); %>
-                </div>
-              </div>
-              </div>    
- 
-              <div class="container">
-                <h3>Weaknesses</h3>
-                
-                <div class="row">
-                  <div class="col-sm">
-                    <% card.weaknesses.forEach((weakness) => { %>
-                      <h5><i><%= weakness.name %></i></h4>
-                      <p><%= weakness.severity %></p>
-                    <% }); %>
-                  </div>
-                </div>
-                </div> 
-
-
-      
+        </div>
+      </div>
     </div>
   </div>
+  
+  <!-- Footer Include -->
   <%- include ('partials/footer') %>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"
+  integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
+  crossorigin="anonymous"></script>
 </body>
 </html>

@@ -244,43 +244,54 @@ app.post('/signup', signupValidator, async (req, res) => {
 
 });
 
-app.post("/add-card", (req, res) => {
+app.post("/add-card", async (req, res) => {
     //cant add cards to collection unless you're logged in
     const sess_obj = req.session;
     if (!sess_obj.authen) {
         res.send("Access Denied");
     } else {
 
-        //todo: cant add cards to someone elses collection
+        // ensure you cant add cards to someone elses collection
         const card_id = req.body.card_id;
         const collection_id = req.body.collection_id;
-        let insertSQLcardcollection = `INSERT into card_collection (collection_id, card_id) VALUES (?,?)`;
-        console.log(insertSQLcardcollection);
-        db.query(insertSQLcardcollection, [collection_id, card_id], (err, dataset) => {
-            req.flash('collectionMessage', 'Added to Collection!');
-
-            res.redirect('back');
-        });
+        let colls = await db.promise().query(`SELECT * FROM collection WHERE collection_id = ? AND user_id = ?`, [collection_id,sess_obj.authen]);
+        if(colls[0].length>0){
+            let insertSQLcardcollection = `INSERT into card_collection (collection_id, card_id) VALUES (?,?)`;
+            console.log(insertSQLcardcollection);
+            db.query(insertSQLcardcollection, [collection_id, card_id], (err, dataset) => {
+                req.flash('collectionMessage', 'Added to Collection!');
+    
+                res.redirect('back');
+            });
+        }else{
+            res.send("Access Denied");
+        }
 
     }
 })
 
-app.post("/remove-card", (req, res) => {
+app.post("/remove-card", async (req, res) => {
     //cant remove cards from collection unless you're logged in
     const sess_obj = req.session;
     if (!sess_obj.authen) {
         res.send("Access Denied");
     } else {
 
-        //todo: cant remove cards from someone elses collection
+        //cant remove cards from someone elses collection
         const card_id = req.body.card_id;
         const collection_id = req.body.collection_id;
+        let colls = await db.promise().query(`SELECT * FROM collection WHERE collection_id = ? AND user_id = ?`, [collection_id,sess_obj.authen]);
+        if(colls[0].length>0){
+
         let deleteSQLcardcollection = `DELETE FROM card_collection WHERE collection_id=? AND card_id=?`;
         console.log(deleteSQLcardcollection);
         db.query(deleteSQLcardcollection, [collection_id, card_id], (err, dataset) => {
             req.flash('collectionMessage', 'Card removed from Collection!');
             res.redirect('back');
         });
+    }else{
+        res.send("Access Denied");
+    }
 
     }
 })
@@ -539,6 +550,7 @@ app.get(`/community`, (req, res) => {
     let communitySQL = `SELECT COUNT(card_collection.card_id) AS cardCount, collection.*, user.user_name FROM collection 
 	    INNER JOIN user ON user.user_id = collection.user_id 
         INNER JOIN card_collection ON card_collection.collection_id=collection.collection_id
+        WHERE collection.is_wishlist = 0
         GROUP BY collection.collection_id
         ORDER BY RAND() LIMIT 5 `;
     db.query(communitySQL, async (err, dataset) => {
