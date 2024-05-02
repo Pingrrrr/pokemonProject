@@ -1,21 +1,22 @@
 const express = require("express");
-flash = require('express-flash'); //https://www.npmjs.com/package/express-flash & https://stackoverflow.com/a/42341464
+const flash = require('express-flash'); //https://www.npmjs.com/package/express-flash & https://stackoverflow.com/a/42341464
 const bodyParser = require('body-parser')
+const urlencodedParser = bodyParser.urlencoded({ extended: true })
 const cookieParser = require('cookie-parser');
 const sessions = require('express-session');
 const bcrypt = require('bcrypt');
 const url = require('url');
+const path = require('path');
+const { query, body, validationResult } = require('express-validator'); //https://express-validator.github.io/docs
 const saltRounds = 10;
 
 
 var app = express();
-const path = require('path');
 const PORT = 3000;
 
-const jsonParser = bodyParser.json();
-const urlencodedParser = bodyParser.urlencoded({ extended: true })
-const halfDay = 1000 * 60 * 60 * 12;
 
+//seesion setup
+const halfDay = 1000 * 60 * 60 * 12;
 app.use(sessions({
     secret: "thisisVERYsecretVERYshush2",
     saveUninitialized: true,
@@ -24,12 +25,14 @@ app.use(sessions({
 }));
 
 //https://stackoverflow.com/a/37184041
+//locals allows the session object to be used in any of the rendered ejs files
 app.use(function(req, res, next) {
     res.locals.authen = req.session.authen;
     next();
   });
 
 
+//DB setup
 const mysql = require('mysql2');
 const db = mysql.createConnection({
     host: 'localhost',
@@ -45,6 +48,7 @@ db.connect((err) => {
 });
 
 
+//middleware setup
 app.use(express.static('static'));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser('keyboard cat'));
@@ -53,7 +57,6 @@ app.set("view engine", "ejs");
 
 
 app.get("/", function (req, res) {
-    
     const sessionobj = req.session;
     if(sessionobj.authen){
         res.redirect('/dashboard');
@@ -62,27 +65,24 @@ app.get("/", function (req, res) {
         db.query(readcard, (err, dataset) => {
             res.render("tradecard", { dataset });
         })
-
     }
-
-
-
-
 });
 
 app.get('/login', (req, res) => {
     res.render("login", {errMsg: ""});
 });
 
-app.post('/login', urlencodedParser, async (req, res) => {
+app.post('/login', body('username').notEmpty(), async (req, res) => {
     console.log(req.body);
+    const result = validationResult(req);
+    console.log(result)
     const username = req.body.username;
     const password = req.body.password;
     let sess_obj = req.session;
     
-    const checkuser = `SELECT * FROM user WHERE user_name = "${username}" `;
+    const checkuser = `SELECT * FROM user WHERE user_name = ? `;
 
-    db.query(checkuser, async (err, rows) => {
+    db.query(checkuser, [username],async (err, rows) => {
         if(err) throw err;
         const numRows = rows.length;
         if(numRows > 0){
@@ -96,8 +96,6 @@ app.post('/login', urlencodedParser, async (req, res) => {
                 let errMsg = 'Incorrect username or password';
                 res.render("login", {errMsg:errMsg});
             }
-
-            
         }else{
             let errMsg = 'Incorrect username or password';
             res.render("login", {errMsg:errMsg});
@@ -111,12 +109,10 @@ app.get('/logout', (req, res) => {
 });
 
 app.get('/dashboard',(req, res)=>{
-    console.log("get dashboard");
     const sessionobj = req.session;
-    
     if(sessionobj.authen){
-        const collectionsSQL = `SELECT * FROM collection WHERE user_id =${sessionobj.authen}`;
-        db.query(collectionsSQL,(err, dataset) => {
+        const collectionsSQL = `SELECT * FROM collection WHERE user_id = ?`;
+        db.query(collectionsSQL,[sessionobj.authen],(err, dataset) => {
             res.render("dashboard", {collections: dataset, session: req.session});
         });
         
@@ -192,9 +188,9 @@ app.post("/add-card", (req, res) =>{
         //todo: cant add cards to someone elses collection
         const card_id = req.body.card_id;
         const collection_id = req.body.collection_id;
-        let insertSQLcardcollection = `INSERT into card_collection (collection_id, card_id) VALUES (${collection_id},${card_id})`;
+        let insertSQLcardcollection = `INSERT into card_collection (collection_id, card_id) VALUES (?,?)`;
         console.log(insertSQLcardcollection);
-        db.query(insertSQLcardcollection,(err, dataset)=>{
+        db.query(insertSQLcardcollection,[collection_id,card_id],(err, dataset)=>{
             req.flash('collectionMessage', 'Added to Collection!');
          
             res.redirect('back');
@@ -213,9 +209,9 @@ app.post("/remove-card", (req, res) =>{
         //todo: cant remove cards from someone elses collection
         const card_id = req.body.card_id;
         const collection_id = req.body.collection_id;
-        let deleteSQLcardcollection = `DELETE FROM card_collection WHERE collection_id=${collection_id} AND card_id=${card_id}`;
+        let deleteSQLcardcollection = `DELETE FROM card_collection WHERE collection_id=? AND card_id=?`;
         console.log(deleteSQLcardcollection);
-        db.query(deleteSQLcardcollection,(err, dataset)=>{
+        db.query(deleteSQLcardcollection,[collection_id,card_id],(err, dataset)=>{
             req.flash('collectionMessage', 'Card removed from Collection!');
             res.redirect('back');
         });
@@ -241,12 +237,12 @@ app.get("/cards", async (req, res) => {
     let collections=[];
 
     if(sess_obj.authen){
-        let collectionsSQL = await db.promise().query(`SELECT collection.* FROM collection WHERE collection.user_id = ${sess_obj.authen} ORDER BY collection.collection_id`);
+        let collectionsSQL = await db.promise().query(`SELECT collection.* FROM collection WHERE collection.user_id = ? ORDER BY collection.collection_id`,[sess_obj.authen]);
         console.log(collectionsSQL[0]);
         collectionsSQL[0].forEach(async (row)=>{
             console.log(row);
             row.cards=[];
-            let cardCollectionsSQL = await db.promise().query(`SELECT card_id FROM card_collection WHERE collection_id = ${row.collection_id}`);
+            let cardCollectionsSQL = await db.promise().query(`SELECT card_id FROM card_collection WHERE collection_id = ? `, [row.collection_id]);
             cardCollectionsSQL[0].forEach((card)=>{
                 row.cards.push(card.card_id);
             });
@@ -264,57 +260,26 @@ app.get("/cards", async (req, res) => {
     let cardsQuery = `INNER JOIN \`set\` ON card.set_id=\`set\`.set_id INNER JOIN expansion ON set.expansion_id=expansion.expansion_id `;
     let joins = [];
     let wheres = [];
+    let values = [];
     let orderby = ``;
     let limit = 25; //default
     let page = 0; //default
 
 
-
+    //sorting options
     const sorts = new Map();
     sorts.set('pokedex', '-card.pokedex_id DESC'); //sort nulls last: https://stackoverflow.com/a/8174026
     sorts.set('nameasc', 'card.name ASC');
     sorts.set('namedesc', 'card.name DESC');
-
-
-    const limit_results = req.query.limit;
-    const results_page = req.query.page;
-
     const sortby = req.query.sortby;
     const sortby_orderby=` ORDER BY ${sorts.get(sortby)}`;
+    if(sortby!=null && sorts.has(sortby)){
+        orderby=sortby_orderby;
+    }
 
-    const name = req.query.name;
-    const name_where = `LOWER(card.name) LIKE "%${name}%"`;
-
-    const collection = req.query.collection;
-    const collection_where = `card.card_id IN (SELECT card_collection.card_id FROM card_collection WHERE card_collection.collection_id IN ('${[].concat(collection).join(`','`)}'))`;
-
-    const type = req.query.type;
-    const type_join = `INNER JOIN card_type ON card.card_id=card_type.card_id INNER JOIN type ON card_type.type_id=type.type_id`;
-    const type_where = `type.name IN ('${[].concat(type).join(`','`)}')`;
-
-    const stage = req.query.stage;
-    const stage_where = `card.stage IN ('${[].concat(stage).join(`','`)}')`;
-
-    const rarity = req.query.rarity;
-    const rarity_where = `card.rarity IN ('${[].concat(rarity).join(`','`)}')`;
-
-    const category = req.query.category;
-    const category_where = `card.category IN ('${[].concat(category).join(`','`)}')`;
-
-    const weakness = req.query.weakness;
-    const weakness_join = `INNER JOIN weakness ON card.card_id=weakness.card_id`;
-    const weakness_where = `weakness.type_id IN (SELECT type.type_id FROM type WHERE name IN ('${[].concat(weakness).join(`','`)}'))`;
-
-    const resistance = req.query.resistance;
-    const resistance_join = `INNER JOIN resistance ON card.card_id=resistance.card_id`;
-    const resistance_where = `resistance.type_id IN (SELECT type.type_id FROM type WHERE name IN ('${[].concat(resistance).join(`','`)}'))`;
-
-    const set = req.query.set;
-    const set_where = `\`set\`.set_id = ${set}`;
-
-    const expansion = req.query.expansion;
-    const expansion_where = `expansion.expansion_id = ${expansion}`;
-
+    //pagination and results per page
+    const limit_results = req.query.limit;
+    const results_page = req.query.page;
     if(limit_results!=null){
         limit=limit_results;
     }
@@ -323,81 +288,104 @@ app.get("/cards", async (req, res) => {
         page=results_page;
     }
 
-    if(sortby!=null ){
-        orderby=sortby_orderby;
-    }
-
+    //query options
+    const name = req.query.name;
+    const name_where = `LOWER(card.name) LIKE ? `;
     if(name!=null && name!=''){
         wheres.push(name_where);
+        values.push("%"+name+"%");
     }
 
-    if(type!=null && type!='None'){
-        joins.push(type_join);
-        wheres.push(type_where);        
-    }
-
-    if(stage!=null){
-        wheres.push(stage_where);
-    }
-
-    if(rarity!=null){
-        wheres.push(rarity_where);
-    }
-
-    if(category!=null){
-        wheres.push(category_where);
-    }
-
+    const collection = req.query.collection;
+    const collection_where = `card.card_id IN (SELECT card_collection.card_id FROM card_collection WHERE card_collection.collection_id IN (?))`;
     if(collection!=null){
         wheres.push(collection_where);
+        values.push([].concat(collection));
     }
 
+    const type = req.query.type;
+    const type_join = `INNER JOIN card_type ON card.card_id=card_type.card_id INNER JOIN type ON card_type.type_id=type.type_id`;
+    const type_where = `type.name IN (?)`;
+    if(type!=null && type!='None'){
+        joins.push(type_join);
+        wheres.push(type_where);    
+        values.push([].concat(type));    
+    }
+
+    const stage = req.query.stage;
+    const stage_where = `card.stage IN (?)`;
+    if(stage!=null){
+        wheres.push(stage_where);
+        values.push([].concat(stage));
+    }
+
+    const rarity = req.query.rarity;
+    const rarity_where = `card.rarity IN (?)`;
+    if(rarity!=null){
+        wheres.push(rarity_where);
+        values.push([].concat(rarity));
+    }
+
+    const category = req.query.category;
+    const category_where = `card.category IN (?)`;
+    if(category!=null){
+        wheres.push(category_where);
+        values.push([].concat(category));
+    }
+
+    const weakness = req.query.weakness;
+    const weakness_join = `INNER JOIN weakness ON card.card_id=weakness.card_id`;
+    const weakness_where = `weakness.type_id IN (SELECT type.type_id FROM type WHERE name IN (?))`;
     if(weakness!=null){
         joins.push(weakness_join);
         wheres.push(weakness_where);
+        values.push([].concat(weakness));
     }
 
+    const resistance = req.query.resistance;
+    const resistance_join = `INNER JOIN resistance ON card.card_id=resistance.card_id`;
+    const resistance_where = `resistance.type_id IN (SELECT type.type_id FROM type WHERE name IN (?))`;
     if(resistance!=null){
         joins.push(resistance_join);
         wheres.push(resistance_where);
+        values.push([].concat(resistance));
     }
 
+    const set = req.query.set;
+    const set_where = `\`set\`.set_id = ?`;
     if(set!=null ){
         wheres.push(set_where);
+        values.push(set)
     }
 
+    const expansion = req.query.expansion;
+    const expansion_where = `expansion.expansion_id = ?`;
     if(expansion!=null ){
         wheres.push(expansion_where);
+        values.push(expansion);
     }
 
+
+    //build the query
     cardsQuery += joins.join(' ');
     if(wheres.length>0){
         cardsQuery+=" WHERE "+wheres.join(' AND ');
     }
 
-    
-    
-
+    //get the count first
     countQuery=countSelect+cardsQuery;
-    console.log(countQuery);
-    let queryCount = await db.promise().query(countQuery);
+    let queryCount = await db.promise().query(countQuery, values);
     queryCount = queryCount[0][0];
-    console.log(queryCount);
 
+    //get the actual results
     cardsQuery=cardSelect+cardsQuery;
-
-    //order and limit the actual query
     cardsQuery+=orderby;
     cardsQuery+=` LIMIT ${limit} OFFSET ${page*limit} `; //https://stackoverflow.com/a/53574331
-    console.log(cardsQuery);
-    console.log(lastQuery.type);
-    let origUrl = req.originalUrl.split('?')[1] ? req.originalUrl.split('?')[1]:"";
-    console.log("ORIGINAL URL: "+origUrl);
 
-    
-    db.query(cardsQuery, (err, dataset) => {
+    db.query(cardsQuery, values,(err, dataset) => {
         if (err) throw err;
         console.log(lastQuery);
+        let origUrl = req.originalUrl.split('?')[1] ? req.originalUrl.split('?')[1]:"";
         res.render('cards', 
             { 
                 origUrl:  origUrl,
@@ -414,55 +402,9 @@ app.get("/cards", async (req, res) => {
                 lastQuery:lastQuery, 
                 session:sess_obj });
     })
-
 });
 
-//ONE CARD
-app.get('/card', async (req, res) => {
-    const card_id = req.query.id;
-    const readcard = `SELECT * FROM card WHERE card_id = ${card_id} `;
-    let cardSQL = await db.promise().query(readcard);
-    let card = cardSQL[0][0];
-
-    const readtype = `SELECT * FROM card_type INNER JOIN type ON card_type.type_id=type.type_id WHERE card_type.card_id=${card_id} `;
-    let typeSQL = await db.promise().query(readtype);
-    let types = typeSQL[0];
-    card.types=types;
-
-    const cardattack = `  SELECT attack.* FROM card
-	INNER JOIN card_attack ON card_attack.card_id = card.card_id
-    INNER JOIN attack ON card_attack.attack_id = attack.attack_id
-WHERE card.card_id = ${card_id}`;
-    let attackSQL = await db.promise().query(cardattack);
-    let attacks = attackSQL[0];
-    card.attacks=attacks;
-
-    const cardabilties = `  SELECT ability.* FROM card
-	INNER JOIN card_ability ON card_ability.card_id = card.card_id
-    INNER JOIN ability ON card_ability.ability_id = ability.ability_id
-WHERE card.card_id = ${card_id}`;
-    let abilitySQL = await db.promise().query(cardabilties);
-    let abilities = abilitySQL[0];
-    card.abilities=abilities;
-
-    const cardresist = ` SELECT * FROM resistance INNER JOIN type ON resistance.type_id = type.type_id WHERE resistance.card_id = ${card_id}`;
-    let resistanceSQL = await db.promise().query(cardresist);
-    let cardresistances = resistanceSQL[0];
-    card.resistances=cardresistances;
-    
-
-    const cardweakness = ` SELECT * FROM weakness INNER JOIN type ON weakness.type_id = type.type_id WHERE weakness.card_id  = ${card_id}`;
-    let weaknessSQL = await db.promise().query(cardweakness);
-    let cardweaknesses = weaknessSQL[0];
-    card.weaknesses=cardweaknesses;
-    
-
-
-    console.log(card);
-    res.render('card', { card });
-
-});
-
+//moves to the next page in the cards view 
 app.get('/cards-next', (req, res)=>{
     req.query.page = req.query.page==null?1:parseInt(req.query.page)+1;
     res.redirect(url.format({
@@ -472,6 +414,7 @@ app.get('/cards-next', (req, res)=>{
 
 })
 
+//moves to the previous page in the cards view 
 app.get('/cards-prev', (req, res)=>{
     req.query.page = (req.query.page==null || parseInt(req.query.page)<1)?0:parseInt(req.query.page)-1;
     res.redirect(url.format({
@@ -481,25 +424,67 @@ app.get('/cards-prev', (req, res)=>{
 
 })
 
+//ONE CARD
+app.get('/card', async (req, res) => {
+    const card_id = req.query.id;
+    const readcard = `SELECT * FROM card WHERE card_id = ? `;
+    let cardSQL = await db.promise().query(readcard, [card_id]);
+    let card = cardSQL[0][0];
+
+    const readtype = `SELECT * FROM card_type INNER JOIN type ON card_type.type_id=type.type_id WHERE card_type.card_id=? `;
+    let typeSQL = await db.promise().query(readtype,[card_id]);
+    let types = typeSQL[0];
+    card.types=types;
+
+    const cardattack = `  SELECT attack.* FROM card
+	INNER JOIN card_attack ON card_attack.card_id = card.card_id
+    INNER JOIN attack ON card_attack.attack_id = attack.attack_id
+WHERE card.card_id = ?`;
+    let attackSQL = await db.promise().query(cardattack, [card_id]);
+    let attacks = attackSQL[0];
+    card.attacks=attacks;
+
+    const cardabilties = `  SELECT ability.* FROM card
+	INNER JOIN card_ability ON card_ability.card_id = card.card_id
+    INNER JOIN ability ON card_ability.ability_id = ability.ability_id
+WHERE card.card_id = ?`;
+    let abilitySQL = await db.promise().query(cardabilties,[card_id]);
+    let abilities = abilitySQL[0];
+    card.abilities=abilities;
+
+    const cardresist = ` SELECT * FROM resistance INNER JOIN type ON resistance.type_id = type.type_id WHERE resistance.card_id = ?`;
+    let resistanceSQL = await db.promise().query(cardresist,[card_id]);
+    let cardresistances = resistanceSQL[0];
+    card.resistances=cardresistances;
+    
+
+    const cardweakness = ` SELECT * FROM weakness INNER JOIN type ON weakness.type_id = type.type_id WHERE weakness.card_id  = ?`;
+    let weaknessSQL = await db.promise().query(cardweakness, [card_id]);
+    let cardweaknesses = weaknessSQL[0];
+    card.weaknesses=cardweaknesses;
+
+    res.render('card', { card });
+
+});
 
 
 app.get(`/community`,  (req, res) => {
-    let communitySQL = `SELECT collection.*, user.user_name FROM collection INNER JOIN user ON user.user_id = collection.user_id ORDER BY RAND() LIMIT 5; `;
+    let communitySQL = `SELECT COUNT(card_collection.card_id) AS cardCount, collection.*, user.user_name FROM collection 
+	    INNER JOIN user ON user.user_id = collection.user_id 
+        INNER JOIN card_collection ON card_collection.collection_id=collection.collection_id
+        GROUP BY collection.collection_id
+        ORDER BY RAND() LIMIT 5 `;
     db.query(communitySQL, async (err, dataset) => {
 
-        console.log(dataset);
         let collections = dataset
         let cardsList = [];
-        let cardsCollectionSQL = `SELECT * FROM card_collection INNER JOIN card ON card_collection.card_id=card.card_id WHERE card_collection.collection_id = ? LIMIT 5; `;
+        let cardsCollectionSQL = `SELECT * FROM card_collection INNER JOIN card ON card_collection.card_id=card.card_id WHERE card_collection.collection_id = ? LIMIT 5 `;
         for(let i =0; i<dataset.length;i++){
             let cards = await db.promise().query(cardsCollectionSQL, [dataset[i].collection_id])
-            console.log("CARDS::")
-            console.log(cards[0])
+
            cardsList = cardsList.concat(cards[0]);
         }
 
-        console.log("CARDSLIST");
-        console.log(cardsList);
         res.render('community', {cards:cardsList, collections:collections})
     });
     
