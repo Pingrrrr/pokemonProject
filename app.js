@@ -15,7 +15,7 @@ var app = express();
 const PORT = 3000;
 
 
-//seesion setup
+//session setup
 const halfDay = 1000 * 60 * 60 * 12;
 app.use(sessions({
     secret: "thisisVERYsecretVERYshush2",
@@ -51,7 +51,6 @@ db.connect((err) => {
 //middleware setup
 app.use(express.static('static'));
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser('keyboard cat'));
 app.use(flash());
 app.set("view engine", "ejs");
 
@@ -89,10 +88,8 @@ app.post('/login', loginValidator, async (req, res) => {
         const checkuser = `SELECT * FROM user WHERE user_name = ? `;
 
         db.query(checkuser, [username], async (err, rows) => {
-            console.log("querynig")
             if (err) throw err;
             const numRows = rows.length;
-            console.log(numRows)
             if (numRows > 0) {
                 //check the password
                 const comparison = await bcrypt.compare(password, rows[0].user_password);
@@ -173,8 +170,6 @@ app.get('/signup', (req, res) => {
     res.render("signup", {errMsgs:[]});
 });
 
-//https://medium.com/@hcach90/using-express-validator-for-data-validation-in-nodejs-6946afd9d67e
-//https://express-validator.github.io/docs/
 const signupValidator = [
     body('username', 'Username cannot be empty').notEmpty().trim(),
     body('username', 'Username must be between 1 and 20 characters long').isLength({ min: 1, max: 20 }),
@@ -183,7 +178,6 @@ const signupValidator = [
 ];
 
 app.post('/signup', signupValidator, async (req, res) => {
-    console.log("posted signup");
     let errMsgs = [];
     let success = false;
 
@@ -192,9 +186,7 @@ app.post('/signup', signupValidator, async (req, res) => {
 
         const username = req.body.username;
         const password = req.body.password;
-        //https://kennethscoggins.medium.com/how-to-use-mysql-password-encryption-with-nodejs-express-and-bcrypt-ad9ede661109
         const encryptedPassword = await bcrypt.hash(password, saltRounds);
-
 
         //check username
         let existingUser = await db.promise().query(`SELECT * FROM user WHERE user_name = ? `, [username]);
@@ -226,7 +218,6 @@ app.post('/signup', signupValidator, async (req, res) => {
 
             } else {
                 let errMsg = "Something went wrong..."
-
             }
 
         }
@@ -257,7 +248,6 @@ app.post("/add-card", async (req, res) => {
         let colls = await db.promise().query(`SELECT * FROM collection WHERE collection_id = ? AND user_id = ?`, [collection_id,sess_obj.authen]);
         if(colls[0].length>0){
             let insertSQLcardcollection = `INSERT into card_collection (collection_id, card_id) VALUES (?,?)`;
-            console.log(insertSQLcardcollection);
             db.query(insertSQLcardcollection, [collection_id, card_id], (err, dataset) => {
                 req.flash('collectionMessage', 'Added to Collection!');
     
@@ -284,7 +274,6 @@ app.post("/remove-card", async (req, res) => {
         if(colls[0].length>0){
 
         let deleteSQLcardcollection = `DELETE FROM card_collection WHERE collection_id=? AND card_id=?`;
-        console.log(deleteSQLcardcollection);
         db.query(deleteSQLcardcollection, [collection_id, card_id], (err, dataset) => {
             req.flash('collectionMessage', 'Card removed from Collection!');
             res.redirect('back');
@@ -315,21 +304,15 @@ app.get("/cards", async (req, res) => {
 
     if (sess_obj.authen) {
         let collectionsSQL = await db.promise().query(`SELECT collection.* FROM collection WHERE collection.user_id = ? ORDER BY collection.collection_id`, [sess_obj.authen]);
-        console.log(collectionsSQL[0]);
         collectionsSQL[0].forEach(async (row) => {
-            console.log(row);
             row.cards = [];
             let cardCollectionsSQL = await db.promise().query(`SELECT card_id FROM card_collection WHERE collection_id = ? `, [row.collection_id]);
             cardCollectionsSQL[0].forEach((card) => {
                 row.cards.push(card.card_id);
             });
-            console.log(row.cards);
             collections.push(row);
         });
 
-        //collections = collectionsSQL[0];
-        console.log("collections");
-        console.log(collections);
     }
 
     let countSelect = `SELECT COUNT(card.card_id)  AS card_count FROM card `;
@@ -461,7 +444,6 @@ app.get("/cards", async (req, res) => {
 
     db.query(cardsQuery, values, (err, dataset) => {
         if (err) throw err;
-        console.log(lastQuery);
         let origUrl = req.originalUrl.split('?')[1] ? req.originalUrl.split('?')[1] : "";
         res.render('cards',
             {
@@ -572,14 +554,12 @@ app.get(`/community`, (req, res) => {
 app.get(`/sets`, (req, res) => {
     let setSQL = `SELECT \`set\`.*, expansion.expansion_id, expansion.name AS 'expansion_name' FROM \`set\` LEFT JOIN expansion ON \`set\`.expansion_id=expansion.expansion_id`;
     db.query(setSQL, (err, dataset) => {
-        console.log(dataset);
         let expansions = new Map();
         dataset.forEach((row) => {
             if (!expansions.has(row.expansion_id)) {
                 expansions.set(row.expansion_id, { expansion_name: row.expansion_name, expansion_id: row.expansion_id });
             }
         });
-        console.log(expansions);
         res.render('sets', { sets: dataset, expansions: expansions })
     });
 

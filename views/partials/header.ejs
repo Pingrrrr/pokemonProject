@@ -3,11 +3,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Link Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <!--< based footer off this css styling link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/footers/">-->
-    <!--link custom css-->
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="images/pikachu.png">
 </head>
+
 <body>
     <nav class="navbar custom-navbar">
         <!--container fluid to fill the screen-->
@@ -38,12 +37,12 @@
                 <button class="btn dropdown-toggle nav-link" type="button" data-bs-toggle="dropdown">Account</button>
                 <ul class="dropdown-menu checkbox-menu allow-focus">
                     <% if(!authen){%>
-                    <li><a class="dropdown-item" href="/login">Log In</a></li>
-                    <% }else{%>
-                    <li><a class="dropdown-item" href="/logout">Logout</a></li>
-                    <% }%>
+                        <li><a class="dropdown-item" href="/login">Log In</a></li>
+                        <% }else{%>
+                            <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                            <% }%>
                 </ul>
-              </div>
+            </div>
         </div>
 
     </nav>

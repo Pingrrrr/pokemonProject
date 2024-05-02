@@ -9,8 +9,6 @@
   <title>cards</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-  <!--< based footer off this css styling link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/footers/">-->
-  <!--link custom css-->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
     crossorigin="anonymous"></script>
@@ -127,41 +125,40 @@
                   <% }); %>
 
                     <% }); %>
-                    <div class="form-inline">
-                      <label  class="col-mb3 mx-2" for="sortby">Sort By: </label>
-                      <div class="col-mb3">
-                        
-                        <select name="sortby">
-                          <option value="pokedex" <%=lastQuery.sortby==='pokedex' ? 'selected' : '' %>>Pokedex Number
-                          </option>
-                          <option value="nameasc" <%=lastQuery.sortby==='nameasc' ? 'selected' : '' %>>Name (A-Z)
-                          </option>
-                          <option value="namedesc" <%=lastQuery.sortby==='namedesc' ? 'selected' : '' %>>Name (Z-A)
-                          </option>
-                        </select>
+                      <div class="form-inline">
+                        <label class="col-mb3 mx-2" for="sortby">Sort By: </label>
+                        <div class="col-mb3">
+
+                          <select name="sortby">
+                            <option value="pokedex" <%=lastQuery.sortby==='pokedex' ? 'selected' : '' %>>Pokedex Number
+                            </option>
+                            <option value="nameasc" <%=lastQuery.sortby==='nameasc' ? 'selected' : '' %>>Name (A-Z)
+                            </option>
+                            <option value="namedesc" <%=lastQuery.sortby==='namedesc' ? 'selected' : '' %>>Name (Z-A)
+                            </option>
+                          </select>
+                        </div>
+
+                        <label class="col-mb3 mx-2" for="limit">Show: </label>
+                        <div class="col-mb3">
+
+                          <select name="limit">
+                            <option value="25" <%=lastQuery.limit==='25' ? 'selected' : '' %>>25 cards
+                            </option>
+                            <option value="50" <%=lastQuery.limit==='50' ? 'selected' : '' %>>50 cards
+                            </option>
+                            <option value="100" <%=lastQuery.limit==='100' ? 'selected' : '' %>>100 cards
+                            </option>
+                          </select>
+                        </div>
+                        <label class="col-mb3 mx-2" for="limit">Total Results: <%= totalCardCount %> </label>
                       </div>
-
-                      <label  class="col-mb3 mx-2" for="limit">Show: </label>
-                      <div class="col-mb3">
-                        
-                        <select name="limit">
-                          <option value="25" <%=lastQuery.limit==='25' ? 'selected' : '' %>>25 cards
-                          </option>
-                          <option value="50" <%=lastQuery.limit==='50' ? 'selected' : '' %>>50 cards
-                          </option>
-                          <option value="100" <%=lastQuery.limit==='100' ? 'selected' : '' %>>100 cards
-                          </option>
-                        </select>
-                      </div>
-                      <label  class="col-mb3 mx-2" for="limit">Total Results: <%= totalCardCount %> </label>
-                      </div>
-                    </form>
-
-                      
-        <div class="row mb-4"> <!--marg bottom under imgs-->
+        </form>
 
 
-          <!--sets the width of the column to be 2 columns wide on large-sized devices-->
+        <div class="row mb-4"> 
+
+
           <% cards.forEach((card)=> { %>
 
             <div class="card col-lg-2 mb-4 align-items-center">
@@ -225,23 +222,16 @@
 
         <nav class="container-fluid" aria-label="Page navigation example">
           <ul class="pagination justify-content-center pagination-lg">
-                        
-            <% if(page>0){ %>
-            <li class="page-item"><a class="page-link" href='<%= "/cards-prev?"+origUrl %>'>Previous</a></li>
-            <% } %>
 
-            <% if(((parseInt(page)+1)*limit)<totalCardCount){ %>
-            <li class="page-item"><a class="page-link" href='<%= "/cards-next?"+origUrl %>'>Next</a></li>
-            <% } %>
+            <% if(page>0){ %>
+              <li class="page-item"><a class="page-link" href='<%= "/cards-prev?"+origUrl %>'>Previous</a></li>
+              <% } %>
+
+                <% if(((parseInt(page)+1)*limit)<totalCardCount){ %>
+                  <li class="page-item"><a class="page-link" href='<%= "/cards-next?"+origUrl %>'>Next</a></li>
+                  <% } %>
           </ul>
         </nav>
-        
-
-
-
-
-
-
 
         <%- include ('partials/footer') %>
 </body>
